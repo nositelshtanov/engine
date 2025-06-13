@@ -6,6 +6,10 @@
 #include <SFML/OpenGL.hpp>
 // sfml 2.6
 
+#include <algorithm>
+
+#include "shaderProgramCreator.h"
+
 int main()
 {
     sf::ContextSettings contextSettings;
@@ -15,6 +19,43 @@ int main()
 
     sf::Window window(sf::VideoMode::getDesktopMode(), "MyCAD", sf::Style::Default, contextSettings);
     window.setActive(true);
+
+    glewInit();
+
+    glViewport(0, 0, window.getSize().x, window.getSize().y);
+
+    ShaderProgram shaderProgram;
+    shaderProgram.AddVertexShader("vertexshader.vs");
+    shaderProgram.AddFragmentShader("fragmentshader.fs");
+    if (!shaderProgram.LinkProgram())
+        std::cout << "link shader program error" << std::endl;
+    shaderProgram.Use();
+
+    std::vector<float> vertices = 
+    {
+        //-1.0f, 0.0f, 0.0f,
+        //0.0f, 1.0f, 0.0f,
+        //1.0f, 0.0f, 0.0f
+        -0.5f, 0.0f,
+        0.0f, 0.2f,
+        0.0f, 0.2f,
+        0.3f, 0.8f 
+    };
+
+
+    unsigned int vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
+    unsigned int vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
 
     while (window.isOpen())
     {
@@ -28,11 +69,17 @@ int main()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        unsigned int vbo;
-        glGenBuffers(1, &vbo);
+        shaderProgram.Use();
+        glBindVertexArray(vao);
+        glLineWidth(5);
+        glDrawArrays(GL_LINES, 0, vertices.size() / 4);
+        glBindVertexArray(0);
 
         window.display();
     }
+
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
 
     return 0;
 }
