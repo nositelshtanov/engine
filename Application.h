@@ -32,25 +32,6 @@ public:
 
         return true;
     }
-    void CreateWindowContext()
-    {
-        sf::ContextSettings contextSettings;
-        contextSettings.majorVersion = 4;
-        contextSettings.minorVersion = 6;
-        contextSettings.attributeFlags = sf::ContextSettings::Attribute::Core;
-
-        m_window.create(sf::VideoMode::getDesktopMode(), "MyCAD", sf::Style::Default, contextSettings);
-
-        glewInit();
-    }
-    void LoadShaders()
-    {
-        m_shaderProgram.AddVertexShader("vertexshader.vs");
-        m_shaderProgram.AddFragmentShader("fragmentshader.fs");
-        if (!m_shaderProgram.LinkProgram())
-            std::cout << "link shader program error" << std::endl;
-        m_shaderProgram.Use();
-    }
     int Run()
     {
         std::vector<float> vertices = 
@@ -111,5 +92,25 @@ public:
         glDeleteBuffers(1, &vbo);
 
         return 0;
+    }
+private:
+    void CreateWindowContext()
+    {
+        sf::ContextSettings contextSettings;
+        contextSettings.majorVersion = 4;
+        contextSettings.minorVersion = 6;
+        contextSettings.attributeFlags = sf::ContextSettings::Attribute::Core;
+
+        m_window.create(sf::VideoMode::getDesktopMode(), "MyCAD", sf::Style::Default, contextSettings);
+
+        glewInit();
+    }
+    void LoadShaders()
+    {
+        m_shaderProgram.AddVertexShader("vertexshader.vs");
+        m_shaderProgram.AddFragmentShader("fragmentshader.fs");
+        if (!m_shaderProgram.LinkProgram())
+            std::cout << "link shader program error" << std::endl;
+        m_shaderProgram.Use();
     }
 };
