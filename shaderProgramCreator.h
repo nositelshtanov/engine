@@ -80,15 +80,21 @@ class ShaderProgram
     static constexpr unsigned int s_invalidId = std::numeric_limits<unsigned int>::max();
 public:
     ShaderProgram()
-        : m_shaderProgram()
+        : m_shaderProgram(s_invalidId)
         , m_vertexShader(s_invalidId)
         , m_fragmentShader(s_invalidId)
+    {
+    }
+
+    void InitProgram()
     {
         m_shaderProgram = glCreateProgram();
     }
 
     void AddVertexShader(std::string_view VSPath)
     {
+        if (m_shaderProgram == s_invalidId)
+            return;
         ShaderLoader shaderLoader(VSPath);
         shaderLoader.LoadShader();
         auto && VSContent = shaderLoader.ReleaseShaderContent();
@@ -103,6 +109,8 @@ public:
 
     void AddFragmentShader(std::string_view FSPath)
     {
+        if (m_shaderProgram == s_invalidId)
+            return;
         ShaderLoader shaderLoader(FSPath);
         shaderLoader.LoadShader();
         auto && FSContent = shaderLoader.ReleaseShaderContent();
@@ -117,6 +125,8 @@ public:
 
     bool LinkProgram()
     {
+        if (m_shaderProgram == s_invalidId)
+            return false;
         glLinkProgram(m_shaderProgram);
         int success;
         glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &success);
@@ -131,6 +141,8 @@ public:
 
     void Use() const 
     {
+        if (m_shaderProgram == s_invalidId)
+            return;
         glUseProgram(m_shaderProgram);
     } 
 
