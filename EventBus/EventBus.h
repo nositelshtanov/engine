@@ -7,15 +7,15 @@
 
 #include "Event.h"
 
-class IEventReceiver
+class EventReceiver
 {
     static size_t s_lastFreeId;
     size_t m_receiverId;
 public:
-    IEventReceiver()
+    EventReceiver()
         : m_receiverId(s_lastFreeId++)
     {}
-    size_t GetId() const { return m_receiverId; }
+    size_t GetReceiverId() const { return m_receiverId; }
     virtual bool ReceiveEvent(const Event& event) = 0;
 };
 
@@ -24,7 +24,7 @@ class EventBus
     std::vector<std::unique_ptr<Event>> m_eventsToProcess; 
     std::vector<std::unique_ptr<Event>> m_postedEvents;
 
-    using Subscription = std::pair<IEventReceiver*, std::set<EventType>>;
+    using Subscription = std::pair<EventReceiver*, std::set<EventType>>;
 
     std::unordered_map<size_t, Subscription> m_subscribers; 
 public:
@@ -53,18 +53,18 @@ public:
         m_eventsToProcess.clear();
         return processedCount; 
     } 
-    void Subscribe(IEventReceiver& eventReceiver, EventType eventType)
+    void Subscribe(EventReceiver& eventReceiver, EventType eventType)
     {
-        if (auto && it = m_subscribers.find(eventReceiver.GetId()); it != m_subscribers.end())
+        if (auto && it = m_subscribers.find(eventReceiver.GetReceiverId()); it != m_subscribers.end())
         {
             auto && subscription = (*it).second;
             if (subscription.second.find(eventType) == subscription.second.end())
                 subscription.second.insert(eventType);
             return;
         }
-        m_subscribers.insert({eventReceiver.GetId(), std::make_pair(&eventReceiver, std::set<EventType>({eventType}))});
+        m_subscribers.insert({eventReceiver.GetReceiverId(), std::make_pair(&eventReceiver, std::set<EventType>({eventType}))});
     }
-    void Unsubscribe(const IEventReceiver& eventReceiver, EventType eventType)
+    void Unsubscribe(const EventReceiver& eventReceiver, EventType eventType)
     { 
     }
     void SendEvent(std::unique_ptr<Event> event)
