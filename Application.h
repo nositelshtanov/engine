@@ -11,15 +11,19 @@
 #include <algorithm>
 
 #include "shaderProgramCreator.h"
+#include "EventBus/EventBus.h"
+#include "EventBus/Event.h"
 
 class Application
 {
     sf::Window m_window;
     ShaderProgram m_shaderProgram;
+    EventBus m_eventBus; 
 public:
     Application(int argc, char ** argv)
         : m_window()
         , m_shaderProgram()
+        , m_eventBus()
     {
     }
     bool Init()
@@ -56,24 +60,8 @@ public:
 
         while (m_window.isOpen())
         {
-            sf::Event event;
-            while (m_window.pollEvent(event))
-            {
-                switch (event.type)
-                {
-                case sf::Event::Closed:
-                    m_window.close();
-                    break;
-                case sf::Event::KeyPressed:
-                    if (event.key.code = sf::Keyboard::L)
-                        std::cout << "L" << std::endl;
-                case sf::Event::MouseButtonPressed:
-                    if (event.mouseButton.button == sf::Mouse::Left)
-                        std::cout << "Mouse pressed" << std::endl;
-                default:
-                    break;
-                }
-            }
+            CollectEvents(); 
+            m_eventBus.ProcessEvents();
 
             glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
@@ -112,5 +100,27 @@ private:
         if (!m_shaderProgram.LinkProgram())
             std::cout << "link shader program error" << std::endl;
         m_shaderProgram.Use();
+    }
+    void CollectEvents()
+    {
+        sf::Event event;
+        while (m_window.pollEvent(event))
+        {
+            switch (event.type)
+            {
+            case sf::Event::Closed:
+                m_window.close();
+                break;
+            case sf::Event::KeyPressed:
+                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>());
+                //if (event.key.code = sf::Keyboard::L)
+                //    std::cout << "L" << std::endl;
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Left)
+                    m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));
+            default:
+                break;
+            }
+        }
     }
 };
