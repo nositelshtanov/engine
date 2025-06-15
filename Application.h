@@ -13,17 +13,21 @@
 #include "shaderProgramCreator.h"
 #include "EventBus/EventBus.h"
 #include "EventBus/Event.h"
+#include "Processes/PrMain.h"
 
 class Application
 {
     sf::Window m_window;
     ShaderProgram m_shaderProgram;
     EventBus m_eventBus; 
+    PrMain m_mainProc;
+
 public:
     Application(int argc, char ** argv)
         : m_window()
         , m_shaderProgram()
         , m_eventBus()
+        , m_mainProc()
     {
     }
     bool Init()

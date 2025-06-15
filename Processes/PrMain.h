@@ -6,5 +6,6 @@ class PrMain : public ProcessBase
 {
 public:
     PrMain()
+       : ProcessBase(static_cast<PrId>(PrIds::Main), nullptr) 
     {}
-}
+};

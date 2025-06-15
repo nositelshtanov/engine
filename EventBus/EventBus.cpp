@@ -1,3 +1,3 @@
 #include "EventBus.h"
 
-size_t IEventReceiver::s_lastFreeId = 0;
+size_t EventReceiver::s_lastFreeId = 0;
