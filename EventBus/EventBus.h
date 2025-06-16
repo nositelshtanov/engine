@@ -17,6 +17,7 @@ public:
     {}
     size_t GetReceiverId() const { return m_receiverId; }
     virtual bool ReceiveEvent(const Event& event) = 0;
+    virtual ~EventReceiver() = default;
 };
 
 class EventBus

@@ -27,7 +27,7 @@ public:
         : m_window()
         , m_shaderProgram()
         , m_eventBus()
-        , m_mainProc()
+        , m_mainProc(m_eventBus)
     {
     }
     bool Init()
@@ -37,6 +37,10 @@ public:
         glViewport(0, 0, m_window.getSize().x, m_window.getSize().y);
         m_shaderProgram.InitProgram();
         LoadShaders();
+
+        auto && reqEventTypes = m_mainProc.GetRequiredEventTypes();
+        for (auto && eventType : reqEventTypes)
+            m_eventBus.Subscribe(m_mainProc, eventType);
 
         return true;
     }
@@ -113,12 +117,14 @@ private:
             switch (event.type)
             {
             case sf::Event::Closed:
+                m_mainProc.Stop();
                 m_window.close();
                 break;
             case sf::Event::KeyPressed:
-                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>());
-                //if (event.key.code = sf::Keyboard::L)
-                //    std::cout << "L" << std::endl;
+                if (event.key.code = sf::Keyboard::P)
+                    m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::P));
+                else if (event.key.code = sf::Keyboard::M)
+                    m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left)
                     m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));

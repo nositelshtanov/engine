@@ -51,7 +51,19 @@ public:
 class KeyboardEvent : public Event
 {
 public:
-    KeyboardEvent()
+    enum Keys 
+    {
+        P,
+        M,
+        count
+    };
+private:
+    Keys m_key;
+
+public:
+    KeyboardEvent(Keys key)
+        : m_key(key)
     {}
     virtual EventType GetEventType() const { return EventType::KeyBoardEvent; }
+    Keys GetKey() const { return m_key; }
 };
