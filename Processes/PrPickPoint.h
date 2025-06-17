@@ -37,7 +37,9 @@ public:
         {
             m_point = Point2d(mouseEvent.GetX(), mouseEvent.GetY());
             SetFlag(IProcess::fDone);
+            return true;
         } 
+        return false;
     }
 
     virtual std::unique_ptr<IPrResult> GetPrResult() const 

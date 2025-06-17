@@ -5,7 +5,6 @@
 #include <string>
 
 #include "../EventBus/Event.h"
-#include "../EventBus/EventBus.h"
 #include "PrResult.h"
 
 using PrId = size_t;
@@ -17,8 +16,9 @@ enum class PrIds : PrId
     count
 };
 
+class EventReceiver;
 
-class IProcess : public EventReceiver
+class IProcess
 {
 public:
     enum ProcessFlags
@@ -52,5 +52,7 @@ public:
 
     virtual void ChildStop(PrIds id) = 0;
 
-    virtual ~IProcess() override = default;
+    virtual EventReceiver * GetIEventReceiver() = 0;
+
+    virtual ~IProcess() = default;
 };

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "PrPickPoint.h"
+#include "../EventBus/Event.h"
+
 
 class PrMain : public ProcessBase
 {
@@ -33,16 +35,20 @@ public:
         switch (et)
         {
         case EventType::MouseEvent:
-            /* code */
-            break;
+            {
+                break;
+            }
         case EventType::KeyBoardEvent:
-            const auto && keyboardEvent = static_cast<const KeyboardEvent&>(event);
-            if (keyboardEvent.GetKey() == KeyboardEvent::P)
-                RunSubProcess(PrIds::PickPoint);
-            break;
+            {
+                auto && keyboardEvent = static_cast<const KeyboardEvent&>(event);
+                if (keyboardEvent.GetKey() == KeyboardEvent::P)
+                    RunSubProcess(PrIds::PickPoint);
+                break;
+            }
         default:
-            return false;
-            break;
+            {
+                return false;
+            }
         }
         return false;
     }
@@ -62,7 +68,7 @@ public:
 
     virtual void ChildStop(PrIds id) 
     {
-        auto && child =FindChildProc(id);
+        auto && child = FindChildProc(id);
         if (!child)
             return;
         if (child->IsDone())
@@ -73,7 +79,7 @@ public:
             m_childs.erase(child);
             auto && reqEvTypes = child->GetRequiredEventTypes();
             for (auto && evType : reqEvTypes)
-                m_eventBus.Subscribe(*child, evType);
+                m_eventBus.Subscribe(*child->GetIEventReceiver(), evType);
         }
     }
 
@@ -85,13 +91,13 @@ private:
             if (pr->GetPrId() == static_cast<PrId>(id))
                 return pr;
         }
-        return nullptr
+        return nullptr;
     }
     void RunSubProcess(PrIds id)
     {
         if (id == PrIds::PickPoint)
         {
-            auto && pr = std::make_shared<PrPickPoint>(PrIds::PickPoint, this);
+            auto && pr = std::make_shared<PrPickPoint>(static_cast<PrId>(id), this);
             m_childs.emplace(pr);
             bool res = pr->Run();
             pr->SetFlag(IProcess::fActive);
@@ -101,6 +107,5 @@ private:
                 m_eventBus.Subscribe(*pr, evType);    
         }
     }
-
     
 };

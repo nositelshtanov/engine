@@ -5,7 +5,8 @@
 
 #include "IProcess.h"
 
-class ProcessBase :  public IProcess
+class ProcessBase : public EventReceiver 
+                  , public IProcess
 {
     PrId m_id;
 protected:
@@ -14,6 +15,7 @@ protected:
     std::set<std::shared_ptr<IProcess>> m_childs;
 public:
     ProcessBase(PrId id, IProcess * parent)
+        : EventReceiver()
         , IProcess()
         , m_id(id)
         , m_parent(parent)
@@ -54,6 +56,8 @@ public:
     virtual std::set<EventType> GetRequiredEventTypes() const { return {EventType::MouseEvent, EventType::KeyBoardEvent}; }
 
     virtual void ChildStop(PrIds id) {}
+
+    virtual EventReceiver * GetIEventReceiver() { return this; }
 
     virtual ~ProcessBase() override = default;
 };
