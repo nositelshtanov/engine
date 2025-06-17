@@ -2,14 +2,15 @@
 
 #include "PrResult.h"
 #include "PrPickPoint.h"
+#include "ProcessManager.h"
 
 class PrCreatePoint : public ProcessBase
 {
 public:
     using BaseClass = ProcessBase;
 
-    PrCreatePoint(PrId id, IProcess * parent)
-        : ProcessBase(id, parent)
+    PrCreatePoint(PrIds id, IProcess * parent, ProcessManager& prManager)
+        : ProcessBase(id, parent, prManager)
     {}
 
     virtual bool Run()
@@ -41,11 +42,16 @@ public:
     {
         return {EventType::MouseEvent};
     }
+    
+    virtual std::string GetCurStateHint() const 
+    {
+        return "";
+    }
 
 private:
     void RunPickPointSubProcess()
     {
-        auto && pr = std::make_shared<PrPickPoint>(static_cast<PrId>(PrIds::PickPoint), this);
+        auto && pr = std::make_shared<PrPickPoint>(PrIds::PickPoint, this, m_prManager);
         m_childs.emplace(pr);
         bool res = pr->Run();
     }

@@ -7,9 +7,7 @@
 #include "../EventBus/Event.h"
 #include "PrResult.h"
 
-using PrId = size_t;
-
-enum class PrIds : PrId
+enum class PrIds : size_t 
 {
     Main = 0,
     PickPoint,
@@ -30,7 +28,7 @@ public:
         fCancelled = 4
     };
     
-    virtual PrId GetPrId() const = 0;
+    virtual PrIds GetPrId() const = 0;
 
     virtual bool Run() = 0;
     virtual bool Stop() = 0;

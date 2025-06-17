@@ -12,7 +12,7 @@ class PrPickPoint : public ProcessBase
 public:
     using BaseClass = ProcessBase;
 
-    PrPickPoint(PrId id, IProcess * parent, ProcessManager & prManager)
+    PrPickPoint(PrIds id, IProcess * parent, ProcessManager & prManager)
         : ProcessBase(id, parent, prManager)
     {}
 

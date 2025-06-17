@@ -10,14 +10,14 @@
 class ProcessBase : public EventReceiver 
                   , public IProcess
 {
-    PrId m_id;
+    PrIds m_id;
 protected:
     IProcess* m_parent;
     size_t m_flags;
     std::set<std::shared_ptr<IProcess>> m_childs;
     ProcessManager& m_prManager;
 public:
-    ProcessBase(PrId id, IProcess * parent, ProcessManager& prManager)
+    ProcessBase(PrIds id, IProcess * parent, ProcessManager& prManager)
         : EventReceiver()
         , IProcess()
         , m_id(id)
@@ -26,7 +26,7 @@ public:
         , m_childs()
         , m_prManager(prManager)
     {}
-    virtual PrId GetPrId() const override { return m_id; }
+    virtual PrIds GetPrId() const override { return m_id; }
     
     virtual bool Run() override
     { 

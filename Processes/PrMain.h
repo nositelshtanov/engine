@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ProcessManager.h"
+#include "ProcessCreator.h"
 #include "PrPickPoint.h"
 #include "../EventBus/Event.h"
 
@@ -11,7 +12,7 @@ public:
     using BaseClass = ProcessBase;
 
     PrMain(ProcessManager& prManager)
-       : ProcessBase(static_cast<PrId>(PrIds::Main), nullptr, prManager) 
+       : ProcessBase(static_cast<PrIds>(PrIds::Main), nullptr, prManager) 
     {}
 
     virtual bool Run() override
@@ -80,7 +81,7 @@ private:
     {
         for (auto && pr : m_childs)
         {
-            if (pr->GetPrId() == static_cast<PrId>(id))
+            if (pr->GetPrId() == id)
                 return pr;
         }
         return nullptr;
@@ -89,7 +90,7 @@ private:
     {
         if (id == PrIds::PickPoint)
         {
-            auto && pr = std::make_shared<PrPickPoint>(static_cast<PrId>(id), this, m_prManager);
+            std::shared_ptr<IProcess> pr(CreateProc(PrIds::PickPoint, this, m_prManager));
             m_childs.emplace(pr);
             bool res = pr->Run();
         }
