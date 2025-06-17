@@ -1,8 +1,9 @@
 #pragma once
 
 #include "PrResult.h"
-#include "PrPickPoint.h"
 #include "ProcessManager.h"
+#include "ProcessCreator.h"
+#include "ProcessBase.h"
 
 class PrCreatePoint : public ProcessBase
 {
@@ -15,11 +16,15 @@ public:
 
     virtual bool Run()
     {
-        return BaseClass::Run();
+        bool res = BaseClass::Run();
+        RunPickPointSubProcess();
+        return res;
     }
     
     virtual bool Stop()
     {
+        for (auto && child : m_childs)
+            child->Stop();
         return BaseClass::Stop();
     }
 
@@ -48,11 +53,29 @@ public:
         return "";
     }
 
+    virtual void ChildStop(PrIds id) 
+    {
+        if (id != PrIds::PickPoint)
+            return;
+        
+        auto && child = FindChildProc(id);
+        if (!child)
+            return;
+        if (child->IsDone())
+        {
+            auto && result = child->GetPrResult();
+            if (result->GetType() == PrResultType::Point)
+            {
+                auto && pointResult = static_cast<PrPointResult&>(*result);
+                // TODO: Create Object "Point", write GetPrResult
+            }
+        }
+        m_childs.erase(child);
+    }
+
 private:
     void RunPickPointSubProcess()
     {
-        auto && pr = std::make_shared<PrPickPoint>(PrIds::PickPoint, this, m_prManager);
-        m_childs.emplace(pr);
-        bool res = pr->Run();
+        RunSubProc(PrIds::PickPoint); 
     }
 };

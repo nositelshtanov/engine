@@ -77,15 +77,6 @@ public:
     }
 
 private:
-    std::shared_ptr<IProcess> FindChildProc(PrIds id)
-    {
-        for (auto && pr : m_childs)
-        {
-            if (pr->GetPrId() == id)
-                return pr;
-        }
-        return nullptr;
-    }
     void RunSubProcess(PrIds id)
     {
         if (id == PrIds::PickPoint)

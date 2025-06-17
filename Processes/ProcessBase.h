@@ -6,6 +6,7 @@
 
 #include "IProcess.h"
 #include "ProcessManager.h"
+#include "ProcessCreator.h"
 
 class ProcessBase : public EventReceiver 
                   , public IProcess
@@ -68,6 +69,24 @@ public:
     virtual void ChildStop(PrIds id) {}
 
     virtual EventReceiver * GetIEventReceiver() { return this; }
+
+    std::shared_ptr<IProcess> RunSubProc(PrIds id)
+    {
+        std::shared_ptr<IProcess> pr(CreateProc(id, this, m_prManager));
+        m_childs.emplace(pr);
+        bool res = pr->Run();      
+        return pr;
+    }
+
+    std::shared_ptr<IProcess> FindChildProc(PrIds id)
+    {
+        for (auto && pr : m_childs)
+        {
+            if (pr->GetPrId() == id)
+                return pr;
+        }
+        return nullptr;
+    }
 
     virtual ~ProcessBase() override = default;
 };
