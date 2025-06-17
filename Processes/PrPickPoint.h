@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "ProcessManager.h"
 #include "ProcessBase.h"
 #include "../Math/Base.h"
 
@@ -11,8 +12,8 @@ class PrPickPoint : public ProcessBase
 public:
     using BaseClass = ProcessBase;
 
-    PrPickPoint(PrId id, IProcess * parent)
-        : ProcessBase(id, parent)
+    PrPickPoint(PrId id, IProcess * parent, ProcessManager & prManager)
+        : ProcessBase(id, parent, prManager)
     {}
 
     virtual bool Run()

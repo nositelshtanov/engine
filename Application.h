@@ -13,6 +13,7 @@
 #include "shaderProgramCreator.h"
 #include "EventBus/EventBus.h"
 #include "EventBus/Event.h"
+#include "Processes/ProcessManager.h"
 #include "Processes/PrMain.h"
 
 class Application
@@ -20,6 +21,7 @@ class Application
     sf::Window m_window;
     ShaderProgram m_shaderProgram;
     EventBus m_eventBus; 
+    ProcessManager m_prManager;
     PrMain m_mainProc;
 
 public:
@@ -27,7 +29,8 @@ public:
         : m_window()
         , m_shaderProgram()
         , m_eventBus()
-        , m_mainProc(m_eventBus)
+        , m_prManager(m_eventBus)
+        , m_mainProc(m_prManager)
     {
     }
     bool Init()
@@ -117,17 +120,23 @@ private:
             switch (event.type)
             {
             case sf::Event::Closed:
+            {
                 m_mainProc.Stop();
                 m_window.close();
                 break;
+            }
             case sf::Event::KeyPressed:
+            {
                 if (event.key.code = sf::Keyboard::P)
                     m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::P));
                 else if (event.key.code = sf::Keyboard::M)
                     m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
+            }
             case sf::Event::MouseButtonPressed:
+            {
                 if (event.mouseButton.button == sf::Mouse::Left)
                     m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));
+            }
             default:
                 break;
             }

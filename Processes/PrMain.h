@@ -1,20 +1,17 @@
 #pragma once
 
+#include "ProcessManager.h"
 #include "PrPickPoint.h"
 #include "../EventBus/Event.h"
 
 
 class PrMain : public ProcessBase
 {
-    std::vector<IProcess*> m_processesStack;
-    EventBus& m_eventBus;
 public:
     using BaseClass = ProcessBase;
 
-    PrMain(EventBus& eventBus)
-       : ProcessBase(static_cast<PrId>(PrIds::Main), nullptr) 
-       , m_processesStack()
-       , m_eventBus(eventBus)
+    PrMain(ProcessManager& prManager)
+       : ProcessBase(static_cast<PrId>(PrIds::Main), nullptr, prManager) 
     {}
 
     virtual bool Run() override
@@ -26,6 +23,8 @@ public:
     virtual bool Stop() override
     { 
         bool res = BaseClass::Stop();
+        for (auto && child : m_childs)
+            child->Stop(); 
         return res;
     }
 
@@ -64,8 +63,6 @@ public:
     virtual std::string GetCurStateHint() const { return ""; }
     virtual void CancelCurState() {} 
 
-    IProcess* GetActiveProcess() const { return !m_processesStack.empty() ? m_processesStack.back() : nullptr; }
-
     virtual void ChildStop(PrIds id) 
     {
         auto && child = FindChildProc(id);
@@ -74,13 +71,8 @@ public:
         if (child->IsDone())
         {
             auto && result = child->GetPrResult();
-            child->UnsetFlag(IProcess::fActive);
-            m_processesStack.pop_back();
-            m_childs.erase(child);
-            auto && reqEvTypes = child->GetRequiredEventTypes();
-            for (auto && evType : reqEvTypes)
-                m_eventBus.Subscribe(*child->GetIEventReceiver(), evType);
         }
+        m_childs.erase(child);
     }
 
 private:
@@ -97,14 +89,9 @@ private:
     {
         if (id == PrIds::PickPoint)
         {
-            auto && pr = std::make_shared<PrPickPoint>(static_cast<PrId>(id), this);
+            auto && pr = std::make_shared<PrPickPoint>(static_cast<PrId>(id), this, m_prManager);
             m_childs.emplace(pr);
             bool res = pr->Run();
-            pr->SetFlag(IProcess::fActive);
-            m_processesStack.push_back(pr.get());
-            auto && reqEvTypes = pr->GetRequiredEventTypes();
-            for (auto && evType : reqEvTypes)
-                m_eventBus.Subscribe(*pr, evType);    
         }
     }
     

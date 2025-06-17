@@ -2,8 +2,10 @@
 
 #include <set>
 #include <memory>
+#include <iostream>
 
 #include "IProcess.h"
+#include "ProcessManager.h"
 
 class ProcessBase : public EventReceiver 
                   , public IProcess
@@ -13,28 +15,36 @@ protected:
     IProcess* m_parent;
     size_t m_flags;
     std::set<std::shared_ptr<IProcess>> m_childs;
+    ProcessManager& m_prManager;
 public:
-    ProcessBase(PrId id, IProcess * parent)
+    ProcessBase(PrId id, IProcess * parent, ProcessManager& prManager)
         : EventReceiver()
         , IProcess()
         , m_id(id)
         , m_parent(parent)
         , m_flags(0)
         , m_childs()
+        , m_prManager(prManager)
     {}
     virtual PrId GetPrId() const override { return m_id; }
     
     virtual bool Run() override
     { 
         SetFlag(IProcess::fRunning);
+        m_prManager.PushProcess(this);
         return true; 
     }
 
     virtual bool Stop() override
     { 
         UnsetFlag(IProcess::fRunning);
+
+        if (m_prManager.PopProcess() != this)
+            std::cout << "Пиздоооос!!!" << std::endl; 
+
         if (m_parent)
             m_parent->ChildStop(static_cast<PrIds>(GetPrId()));
+
         return true; 
     }
 

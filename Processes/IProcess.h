@@ -13,6 +13,7 @@ enum class PrIds : PrId
 {
     Main = 0,
     PickPoint,
+    CreatePoint,
     count
 };
 
