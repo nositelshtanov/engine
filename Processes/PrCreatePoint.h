@@ -1,17 +1,23 @@
 #pragma once
 
+#include <memory>
+
 #include "PrResult.h"
 #include "ProcessManager.h"
 #include "ProcessCreator.h"
 #include "ProcessBase.h"
+#include "../Scene/Point3dObj.h"
+
 
 class PrCreatePoint : public ProcessBase
 {
+    std::shared_ptr<Point3dObj> m_pointObj;
 public:
     using BaseClass = ProcessBase;
 
     PrCreatePoint(PrIds id, IProcess * parent, ProcessManager& prManager)
         : ProcessBase(id, parent, prManager)
+        , m_pointObj(nullptr)
     {}
 
     virtual bool Run()
@@ -25,6 +31,7 @@ public:
     {
         for (auto && child : m_childs)
             child->Stop();
+        /// TODO добавить объект в модель через контроллер
         return BaseClass::Stop();
     }
 
@@ -33,9 +40,19 @@ public:
         return false;
     }
 
+    virtual bool IsDone() const 
+    {
+        return m_pointObj.get();
+    }
+
+    virtual bool IsCancelled() const 
+    {
+        return !IsDone(); 
+    }
+
     virtual std::unique_ptr<IPrResult> GetPrResult() const 
     {
-        return nullptr;
+        return std::make_unique<PrObjResult>(m_pointObj);
     }
 
     virtual void CancelCurState() 
@@ -67,7 +84,7 @@ public:
             if (result->GetType() == PrResultType::Point)
             {
                 auto && pointResult = static_cast<PrPointResult&>(*result);
-                // TODO: Create Object "Point", write GetPrResult
+                m_pointObj.reset(new Point3dObj(pointResult.GetPoint()));
             }
         }
         m_childs.erase(child);
