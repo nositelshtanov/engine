@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "PrResult.h"
-#include "ProcessManager.h"
+#include "../Editor3D.h"
 #include "ProcessCreator.h"
 #include "ProcessBase.h"
 #include "../Scene/Point3dObj.h"
@@ -15,8 +15,8 @@ class PrCreatePoint : public ProcessBase
 public:
     using BaseClass = ProcessBase;
 
-    PrCreatePoint(PrIds id, IProcess * parent, ProcessManager& prManager)
-        : ProcessBase(id, parent, prManager)
+    PrCreatePoint(PrIds id, IProcess * parent, Editor3D& editor)
+        : ProcessBase(id, parent, editor)
         , m_pointObj(nullptr)
     {}
 

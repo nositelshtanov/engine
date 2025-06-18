@@ -2,6 +2,6 @@
 
 #include "IProcess.h"
 
-class ProcessManager;
+class Editor3D;
 
-IProcess* CreateProc(PrIds id, IProcess* parent, ProcessManager& prManager);
+IProcess* CreateProc(PrIds id, IProcess* parent, Editor3D&);

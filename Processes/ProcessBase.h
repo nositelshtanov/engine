@@ -5,8 +5,8 @@
 #include <iostream>
 
 #include "IProcess.h"
-#include "ProcessManager.h"
 #include "ProcessCreator.h"
+#include "../Editor3D.h"
 
 class ProcessBase : public EventReceiver 
                   , public IProcess
@@ -16,23 +16,23 @@ protected:
     IProcess* m_parent;
     size_t m_flags;
     std::set<std::shared_ptr<IProcess>> m_childs;
-    ProcessManager& m_prManager;
+    Editor3D& m_editor;
 public:
-    ProcessBase(PrIds id, IProcess * parent, ProcessManager& prManager)
+    ProcessBase(PrIds id, IProcess * parent, Editor3D& editor)
         : EventReceiver()
         , IProcess()
         , m_id(id)
         , m_parent(parent)
         , m_flags(0)
         , m_childs()
-        , m_prManager(prManager)
+        , m_editor(editor)
     {}
     virtual PrIds GetPrId() const override { return m_id; }
     
     virtual bool Run() override
     { 
         SetFlag(IProcess::fRunning);
-        m_prManager.PushProcess(this);
+        m_editor.GetPrManager().PushProcess(this);
         return true; 
     }
 
@@ -40,7 +40,7 @@ public:
     { 
         UnsetFlag(IProcess::fRunning);
 
-        if (m_prManager.PopProcess() != this)
+        if (m_editor.GetPrManager().PopProcess() != this)
             std::cout << "Пиздоооос!!!" << std::endl; 
 
         if (m_parent)
@@ -72,7 +72,7 @@ public:
 
     std::shared_ptr<IProcess> RunSubProc(PrIds id)
     {
-        std::shared_ptr<IProcess> pr(CreateProc(id, this, m_prManager));
+        std::shared_ptr<IProcess> pr(CreateProc(id, this, m_editor));
         m_childs.emplace(pr);
         bool res = pr->Run();      
         return pr;

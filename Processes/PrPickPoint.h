@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "ProcessManager.h"
+#include "../Editor3D.h"
 #include "ProcessBase.h"
 #include "../Math/Base.h"
 
@@ -12,8 +12,8 @@ class PrPickPoint : public ProcessBase
 public:
     using BaseClass = ProcessBase;
 
-    PrPickPoint(PrIds id, IProcess * parent, ProcessManager & prManager)
-        : ProcessBase(id, parent, prManager)
+    PrPickPoint(PrIds id, IProcess * parent, Editor3D& editor)
+        : ProcessBase(id, parent, editor)
     {}
 
     virtual bool Run()

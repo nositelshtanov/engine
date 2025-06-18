@@ -13,6 +13,7 @@
 #include "shaderProgramCreator.h"
 #include "EventBus/EventBus.h"
 #include "EventBus/Event.h"
+#include "Editor3D.h"
 #include "Processes/ProcessManager.h"
 #include "Processes/PrMain.h"
 
@@ -22,6 +23,7 @@ class Application
     ShaderProgram m_shaderProgram;
     EventBus m_eventBus; 
     ProcessManager m_prManager;
+    Editor3D m_editor;
     PrMain m_mainProc;
 
 public:
@@ -30,7 +32,8 @@ public:
         , m_shaderProgram()
         , m_eventBus()
         , m_prManager(m_eventBus)
-        , m_mainProc(m_prManager)
+        , m_editor(m_prManager)
+        , m_mainProc(m_editor)
     {
     }
     bool Init()
