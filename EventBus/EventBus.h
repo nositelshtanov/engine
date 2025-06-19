@@ -107,10 +107,20 @@ public:
     }
     void SendEvent(std::unique_ptr<Event> event)
     {
+        if (event && !event->HasRecipients() && !event->IsBroadcast())
+        {
+            m_eventsWithOnlyEmitter.emplace(event->GetEventEmitterId(), std::move(event));
+            return;
+        }
         m_eventsToProcess.push_back(std::move(event));
     }
     void PostEvent(std::unique_ptr<Event> event) 
     {
+        if (event && !event->HasRecipients() && !event->IsBroadcast())
+        {
+            m_postedEventsWithOnlyEmitter.emplace(event->GetEventEmitterId(), std::move(event));
+            return;
+        }
         m_postedEvents.push_back(std::move(event));
     }
 private:
