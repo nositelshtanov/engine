@@ -34,14 +34,14 @@ private:
     void DeactivateProcess(IProcess * pr)
     {
         pr->UnsetFlag(IProcess::fActive);
-        auto && reqEvTypes = pr->GetRequiredEventTypes();
+        auto && reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
         for (auto && evType : reqEvTypes)
             m_eventBus.Unsubscribe(*pr->GetIEventReceiver(), evType);
     }
     void ActivateProcess(IProcess * pr)
     {
         pr->SetFlag(IProcess::fActive);
-        auto && reqEvTypes = pr->GetRequiredEventTypes();
+        auto && reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
         for (auto && evType : reqEvTypes)
             m_eventBus.Subscribe(*pr->GetIEventReceiver(), evType);
     }

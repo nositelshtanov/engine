@@ -47,8 +47,6 @@ public:
     virtual std::string GetCurStateHint() const = 0;
     virtual void CancelCurState() = 0;
 
-    virtual std::set<EventType> GetRequiredEventTypes() const = 0;
-
     virtual void ChildStop(PrIds id) = 0;
 
     virtual EventReceiver * GetIEventReceiver() = 0;

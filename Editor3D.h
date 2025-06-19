@@ -19,4 +19,9 @@ public:
     {
         return false;
     }
+
+    virtual std::set<EventType> GetRequiredEventTypes() const 
+    {
+        return {};
+    }
 };
