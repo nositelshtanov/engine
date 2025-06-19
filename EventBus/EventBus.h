@@ -26,6 +26,8 @@ class EventBus
 
     std::unordered_map<size_t, Subscription> m_subscribers; 
     std::unordered_map<size_t, std::set<size_t>> m_emittersToSubs; // эмиттер - его подписчики
+
+    // Мб когда нибудь придется разделить типы событий broadcastные, по таргетам и по эмиттеру
 public:
     EventBus()
         : m_eventsToProcess()
@@ -62,6 +64,7 @@ public:
         m_eventsWithOnlyEmitter.clear();
         return processedCount; 
     } 
+    // Подписаться на тип события (будут приходить броадкастные и по таргету). Или лучше даже воспринимать это как фильтр
     void Subscribe(EventReceiver& eventReceiver, EventType eventType)
     {
         if (auto && it = m_subscribers.find(eventReceiver.GetReceiverId()); it != m_subscribers.end())
@@ -73,8 +76,34 @@ public:
         }
         m_subscribers.insert({eventReceiver.GetReceiverId(), {&eventReceiver, std::set<EventType>({eventType})}});
     }
+    // Подписаться на конкретного эмиттера (будут приходить события, на типы которых подписан)
+    void ListenToEmitter(EventReceiver& eventReceiver, size_t emitterId)
+    {
+        if (auto && it = m_emittersToSubs.find(emitterId); it != m_emittersToSubs.end())
+        {
+            auto && emitterSubs = (*it).second; 
+            if (emitterSubs.find(eventReceiver.GetReceiverId()) == emitterSubs.end())
+                emitterSubs.insert(eventReceiver.GetReceiverId());
+            return;
+        }
+        m_emittersToSubs.insert({emitterId, {eventReceiver.GetReceiverId()}});
+        
+    }
     void Unsubscribe(const EventReceiver& eventReceiver, EventType eventType)
     { 
+        if (m_subscribers.find(eventReceiver.GetReceiverId()) == m_subscribers.end())
+            return;
+        
+        auto && subscription = m_subscribers[eventReceiver.GetReceiverId()];
+        subscription.eventTypes.erase(eventType);
+    }
+    void StopListening(EventReceiver& eventReceiver, size_t emitterId)
+    {
+        if (m_emittersToSubs.find(emitterId) == m_emittersToSubs.end())
+            return;
+
+        auto && subs = m_emittersToSubs[emitterId];
+        subs.erase(eventReceiver.GetReceiverId());
     }
     void SendEvent(std::unique_ptr<Event> event)
     {
