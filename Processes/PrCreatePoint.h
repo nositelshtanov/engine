@@ -11,7 +11,7 @@
 
 class PrCreatePoint : public ProcessBase
 {
-    std::shared_ptr<Point3dObj> m_pointObj;
+    std::shared_ptr<Vertex3dObj> m_pointObj;
 public:
     using BaseClass = ProcessBase;
 
@@ -84,7 +84,8 @@ public:
             if (result->GetType() == PrResultType::Point)
             {
                 auto && pointResult = static_cast<PrPointResult&>(*result);
-                m_pointObj.reset(new Point3dObj(pointResult.GetPoint()));
+                m_pointObj.reset(new Vertex3dObj(pointResult.GetPoint()));
+                m_editor.GetCurScene().AddObject(m_pointObj);
             }
         }
         m_childs.erase(child);

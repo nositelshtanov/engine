@@ -24,4 +24,9 @@ public:
     {
         return {};
     }
+
+    void FinishWork()
+    {
+
+    }
 };

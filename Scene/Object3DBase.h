@@ -2,6 +2,7 @@
 
 #include "IObject3d.h"
 #include "../EventBus/EventReceiver.h"
+#include "ObjectsConnector.h"
 
 class Object3DBase : public IObject3D
                    , public EventReceiver

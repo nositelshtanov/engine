@@ -30,6 +30,11 @@ public:
             ActivateProcess(m_stack.back());
         return pr;
     }
+
+    void FinishWork()
+    {
+
+    }
 private:
     void DeactivateProcess(IProcess * pr)
     {

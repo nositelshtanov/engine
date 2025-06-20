@@ -3,21 +3,21 @@
 #include "Object3DBase.h"
 #include "../Math/Base.h"
 
-class Point3dObj : public Object3DBase
+class Vertex3dObj: public Object3DBase
 {
-    Point2d m_point; // пока что 2д
+    MVertex m_vertex; // пока что 2д
 public:
-    Point3dObj()
+    Vertex3dObj()
         : Object3DBase()
-        , m_point()
+        , m_vertex()
     {}
 
-    Point3dObj(const Point2d& p)
+    Vertex3dObj(const MVertex& p)
         : Object3DBase()
-        , m_point(p)
+        , m_vertex(p)
     {}
 
-    Point2d GetPoint() const { return m_point; }
+    MVertex GetPoint() const { return m_vertex; }
 
-    virtual ~Point3dObj() = default;
+    virtual ~Vertex3dObj() = default;
 };

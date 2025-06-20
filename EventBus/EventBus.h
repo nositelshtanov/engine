@@ -77,7 +77,7 @@ public:
         m_subscribers.insert({eventReceiver.GetReceiverId(), {&eventReceiver, std::set<EventType>({eventType})}});
     }
     // Подписаться на конкретного эмиттера (будут приходить события, на типы которых подписан)
-    void ListenToEmitter(EventReceiver& eventReceiver, size_t emitterId)
+    void ListenToEmitter(const EventReceiver& eventReceiver, size_t emitterId)
     {
         if (auto && it = m_emittersToSubs.find(emitterId); it != m_emittersToSubs.end())
         {
@@ -97,7 +97,7 @@ public:
         auto && subscription = m_subscribers[eventReceiver.GetReceiverId()];
         subscription.eventTypes.erase(eventType);
     }
-    void StopListening(EventReceiver& eventReceiver, size_t emitterId)
+    void StopListening(const EventReceiver& eventReceiver, size_t emitterId)
     {
         if (m_emittersToSubs.find(emitterId) == m_emittersToSubs.end())
             return;
@@ -160,3 +160,5 @@ private:
         return false;
     }
 };
+
+EventBus& GetEventBus();

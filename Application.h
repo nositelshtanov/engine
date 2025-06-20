@@ -21,7 +21,7 @@ class Application
 {
     sf::Window m_window;
     ShaderProgram m_shaderProgram;
-    EventBus m_eventBus; 
+    EventBus& m_eventBus; 
     ProcessManager m_prManager;
     Editor3D m_editor;
     PrMain m_mainProc;
@@ -30,7 +30,7 @@ public:
     Application(int argc, char ** argv)
         : m_window()
         , m_shaderProgram()
-        , m_eventBus()
+        , m_eventBus(GetEventBus())
         , m_prManager(m_eventBus)
         , m_editor(m_prManager)
         , m_mainProc(m_editor)
@@ -95,6 +95,17 @@ public:
 
         return 0;
     }
+    void AppClose()
+    {
+        m_mainProc.Stop();
+        m_prManager.FinishWork();
+        m_editor.FinishWork();
+        m_window.close();
+    }
+    ~Application()
+    {
+        delete &m_eventBus;
+    }
 private:
     void CreateWindowContext()
     {
@@ -124,8 +135,7 @@ private:
             {
             case sf::Event::Closed:
             {
-                m_mainProc.Stop();
-                m_window.close();
+                AppClose(); 
                 break;
             }
             case sf::Event::KeyPressed:

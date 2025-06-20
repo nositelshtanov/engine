@@ -38,6 +38,11 @@ public:
         return res;
     }
 
+    virtual void AddObject(ObjectSPtr obj) 
+    {
+        m_objects.insert({obj->GetObjId(), obj});
+    }
+
     virtual ~Scene() override = default;
 private:
     void CreateDefaultObjects()

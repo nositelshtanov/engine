@@ -1,15 +1,16 @@
 #pragma once
 
-class Point2d
+class MVertex 
 {
 public:
     double x;
     double y;
+    double z;
 
-    Point2d()
-        : x(0), y(0)
+    MVertex()
+        : x(0), y(0), z(0)
     {}
-    Point2d(double x, double y)
-        : x(x), y(y)
+    MVertex(double x, double y, double z)
+        : x(x), y(y), z(z)
     {}
 };

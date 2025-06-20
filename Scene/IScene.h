@@ -14,5 +14,7 @@ public:
     virtual ObjectSPtr GetObjById(size_t id) const = 0;
     virtual std::vector<ObjectSPtr> GetAllObjs() const = 0;
 
+    virtual void AddObject(ObjectSPtr obj) = 0;
+
     virtual ~IScene() = default;
 };
