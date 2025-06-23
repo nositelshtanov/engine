@@ -1,16 +1,40 @@
 #pragma once
 
-class MVertex 
+class MPoint3D
 {
 public:
     double x;
     double y;
     double z;
 
-    MVertex()
+    MPoint3D()
         : x(0), y(0), z(0)
     {}
-    MVertex(double x, double y, double z)
+    MPoint3D(double x, double y, double z)
         : x(x), y(y), z(z)
     {}
+};
+
+class MVertex3D
+{
+    MPoint3D m_point;
+public:
+    MVertex3D()
+        : m_point()
+    {}
+    MVertex3D(const MPoint3D& point)
+        : m_point(point)
+    {}
+    MPoint3D GetPoint() const { return m_point; }
+};
+
+class MEdge3D
+{
+public:
+};
+
+class MFace3D
+{
+public:
+
 };

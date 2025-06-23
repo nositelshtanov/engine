@@ -25,3 +25,15 @@ void ObjectsConnector::StopListening(const EventReceiver& eventReceiver, size_t 
 {
     GetEventBus().StopListening(eventReceiver, emitterId);
 }
+
+/// запушить событие в текущую итерацию
+void ObjectsConnector::SendEvent(std::unique_ptr<Event> event)
+{
+    GetEventBus().SendEvent(std::move(event));
+}
+
+/// запушить событие в след. итерацию
+void ObjectsConnector::PostEvent(std::unique_ptr<Event> event)
+{
+    GetEventBus().PostEvent(std::move(event));
+}

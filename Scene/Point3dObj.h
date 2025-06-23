@@ -5,19 +5,24 @@
 
 class Vertex3dObj: public Object3DBase
 {
-    MVertex m_vertex; // пока что 2д
+    MPoint3D m_point; // пока что 2д
 public:
     Vertex3dObj()
         : Object3DBase()
-        , m_vertex()
+        , m_point()
     {}
 
-    Vertex3dObj(const MVertex& p)
+    Vertex3dObj(const MPoint3D& p)
         : Object3DBase()
-        , m_vertex(p)
+        , m_point(p)
     {}
 
-    MVertex GetPoint() const { return m_vertex; }
+    MPoint3D GetPoint() const { return m_point; }
+
+    std::vector<MVertex3D> GetVertexes() const override 
+    {
+        return {MVertex3D(m_point)};
+    }
 
     virtual ~Vertex3dObj() = default;
 };

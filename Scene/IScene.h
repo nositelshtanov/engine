@@ -13,6 +13,7 @@ public:
     virtual size_t GetSceneId() const = 0;
     virtual ObjectSPtr GetObjById(size_t id) const = 0;
     virtual std::vector<ObjectSPtr> GetAllObjs() const = 0;
+    virtual std::vector<std::shared_ptr<IDrawable>> GetAllDrawableObjs() const = 0;
 
     virtual void AddObject(ObjectSPtr obj) = 0;
 

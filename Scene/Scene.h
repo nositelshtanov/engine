@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "IScene.h"
+#include "Object3DBase.h"
 
 class Scene : public IScene
 {
@@ -35,6 +36,16 @@ public:
         res.reserve(m_objects.size());
         for (auto && [id, obj] : m_objects)
             res.push_back(obj); 
+        return res;
+    }
+
+    virtual std::vector<std::shared_ptr<IDrawable>> GetAllDrawableObjs() const 
+    {
+        std::vector<std::shared_ptr<IDrawable>> res;
+        for (auto && [id, obj] : m_objects)
+            if (obj->GetIDrawable())
+                res.push_back(std::static_pointer_cast<IDrawable>(std::static_pointer_cast<Object3DBase>(obj)));
+
         return res;
     }
 

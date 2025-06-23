@@ -21,14 +21,14 @@ public:
 
 class PrPointResult : public IPrResult
 {
-    MVertex m_point;
+    MPoint3D m_point;
 public:
-    PrPointResult(const MVertex& point)
+    PrPointResult(const MPoint3D& point)
         : IPrResult()
         , m_point(point)
     {}
     virtual PrResultType GetType() const override { return PrResultType::Point; }
-    MVertex GetPoint() const { return m_point; }
+    MPoint3D GetPoint() const { return m_point; }
 
     virtual ~PrPointResult() override = default;
 };

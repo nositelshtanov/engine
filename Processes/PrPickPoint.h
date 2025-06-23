@@ -8,7 +8,7 @@
 
 class PrPickPoint : public ProcessBase
 {
-    std::optional<MVertex> m_point; 
+    std::optional<MPoint3D> m_point; 
 public:
     using BaseClass = ProcessBase;
 
@@ -36,7 +36,7 @@ public:
         const MouseEvent& mouseEvent = static_cast<const MouseEvent&>(event);
         if (mouseEvent.GetAction() == MouseEvent::Action::Press && mouseEvent.GetBtn() == MouseEvent::Button::Left)
         {
-            m_point = MVertex(mouseEvent.GetX(), mouseEvent.GetY(), 0);
+            m_point = MPoint3D(mouseEvent.GetX(), mouseEvent.GetY(), 0);
             SetFlag(IProcess::fDone);
             return true;
         } 

@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "shaderProgramCreator.h"
+#include "render/GlRenderer.h"
 #include "EventBus/EventBus.h"
 #include "EventBus/Event.h"
 #include "Editor3D.h"
@@ -25,6 +26,7 @@ class Application
     ProcessManager m_prManager;
     Editor3D m_editor;
     PrMain m_mainProc;
+    GlRenderer m_renderer;
 
 public:
     Application(int argc, char ** argv)
@@ -48,11 +50,24 @@ public:
         for (auto && eventType : reqEventTypes)
             m_eventBus.Subscribe(m_mainProc, eventType);
 
+        m_renderer.AddShaderProgram(m_shaderProgram);
+
         return true;
     }
     int Run()
     {
-        std::vector<float> vertices = 
+        m_renderer.AddScene(&m_editor.GetCurScene());
+
+        while (m_window.isOpen())
+        {
+            CollectEvents();
+            m_eventBus.ProcessEvents();
+
+            m_renderer.Draw();
+
+            m_window.display();
+        }
+        /*std::vector<float> vertices = 
         {
             -0.9, 0.9f,
             0.0f, 0.0f
@@ -91,7 +106,7 @@ public:
         }
 
         glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &vbo);*/
 
         return 0;
     }
