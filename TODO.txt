@@ -1,3 +1,5 @@
+из хедеров вынести лишние инклюды в cpp
+
 В Application использовать интерфейс IRenderer
 А создавать через функцию CreateGLRenderer
 

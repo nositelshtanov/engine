@@ -8,25 +8,15 @@ class Editor3D : public EventReceiver
     ProcessManager& m_prManager;
     Scene m_defaultScene;
 public:
-    Editor3D(ProcessManager& prManager)
-        : m_prManager(prManager)
-    {}
+    Editor3D(ProcessManager& prManager);
 
-    ProcessManager& GetPrManager() { return m_prManager; }
-    Scene& GetCurScene() { return m_defaultScene; }
+    ProcessManager& GetPrManager();
+    Scene& GetCurScene();
 
-    virtual bool ReceiveEvent(const Event& event) 
-    {
-        return false;
-    }
+    virtual bool ReceiveEvent(const Event& event);
+    virtual std::set<EventType> GetRequiredEventTypes() const;
 
-    virtual std::set<EventType> GetRequiredEventTypes() const 
-    {
-        return {};
-    }
+    void FinishWork();
 
-    void FinishWork()
-    {
-
-    }
+    virtual ~Editor3D() override;
 };

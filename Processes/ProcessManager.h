@@ -10,44 +10,13 @@ class ProcessManager
     std::vector<IProcess*> m_stack;
     EventBus& m_eventBus;
 public:
-    ProcessManager(EventBus& eventBus)
-        : m_eventBus(eventBus)
-    {}
+    ProcessManager(EventBus& eventBus);
 
-    void PushProcess(IProcess * pr)
-    {
-        DeactivateProcess(m_stack.back());
-        m_stack.push_back(pr);
-        ActivateProcess(pr); 
-    }
+    void PushProcess(IProcess * pr);
 
-    IProcess * PopProcess()
-    {
-        auto * pr = m_stack.back();
-        DeactivateProcess(pr); 
-        m_stack.pop_back();
-        if (!m_stack.empty())
-            ActivateProcess(m_stack.back());
-        return pr;
-    }
-
-    void FinishWork()
-    {
-
-    }
+    IProcess * PopProcess();
+    void FinishWork();
 private:
-    void DeactivateProcess(IProcess * pr)
-    {
-        pr->UnsetFlag(IProcess::fActive);
-        auto && reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
-        for (auto && evType : reqEvTypes)
-            m_eventBus.Unsubscribe(*pr->GetIEventReceiver(), evType);
-    }
-    void ActivateProcess(IProcess * pr)
-    {
-        pr->SetFlag(IProcess::fActive);
-        auto && reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
-        for (auto && evType : reqEvTypes)
-            m_eventBus.Subscribe(*pr->GetIEventReceiver(), evType);
-    }
+    void DeactivateProcess(IProcess * pr);
+    void ActivateProcess(IProcess * pr);
 };

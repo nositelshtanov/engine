@@ -15,85 +15,19 @@ class PrCreatePoint : public ProcessBase
 public:
     using BaseClass = ProcessBase;
 
-    PrCreatePoint(PrIds id, IProcess * parent, Editor3D& editor)
-        : ProcessBase(id, parent, editor)
-        , m_pointObj(nullptr)
-    {}
+    PrCreatePoint(PrIds id, IProcess * parent, Editor3D& editor);
 
-    virtual bool Run()
-    {
-        bool res = BaseClass::Run();
-        RunPickPointSubProcess();
-        return res;
-    }
-    
-    virtual bool Stop()
-    {
-        for (auto && child : m_childs)
-            child->Stop();
-        /// TODO добавить объект в модель через контроллер
-        return BaseClass::Stop();
-    }
-
-    virtual bool ReceiveEvent(const Event& event) 
-    {
-        return false;
-    }
-
-    virtual bool IsDone() const 
-    {
-        return m_pointObj.get();
-    }
-
-    virtual bool IsCancelled() const 
-    {
-        return !IsDone(); 
-    }
-
-    virtual std::unique_ptr<IPrResult> GetPrResult() const 
-    {
-        return std::make_unique<PrObjResult>(m_pointObj);
-    }
-
-    virtual void CancelCurState() 
-    {
-        Stop();
-    }
-
-    virtual std::set<EventType> GetRequiredEventTypes() const
-    {
-        return {EventType::MouseEvent};
-    }
-    
-    virtual std::string GetCurStateHint() const 
-    {
-        return "";
-    }
-
-    virtual void ChildStop(PrIds id) 
-    {
-        if (id != PrIds::PickPoint)
-            return;
-        
-        auto && child = FindChildProc(id);
-        if (!child)
-            return;
-        if (child->IsDone())
-        {
-            auto && result = child->GetPrResult();
-            if (result->GetType() == PrResultType::Point)
-            {
-                auto && pointResult = static_cast<PrPointResult&>(*result);
-                m_pointObj.reset(new Vertex3dObj(pointResult.GetPoint()));
-                m_editor.GetCurScene().AddObject(m_pointObj);
-            }
-        }
-        m_childs.erase(child);
-    }
+    virtual bool Run();
+    virtual bool Stop();
+    virtual bool ReceiveEvent(const Event& event);
+    virtual bool IsDone() const;
+    virtual bool IsCancelled() const;
+    virtual std::unique_ptr<IPrResult> GetPrResult() const;
+    virtual void CancelCurState();
+    virtual std::set<EventType> GetRequiredEventTypes() const;
+    virtual std::string GetCurStateHint() const;
+    virtual void ChildStop(PrIds id);
 
 private:
-    void RunPickPointSubProcess()
-    {
-        RunSubProc(PrIds::PickPoint); 
-    }
+    void RunPickPointSubProcess();
 };

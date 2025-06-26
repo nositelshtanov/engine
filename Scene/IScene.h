@@ -1,12 +1,15 @@
 #pragma once
 
 #include <stddef.h>
+#include <vector>
+
 #include "IObject3d.h"
 
 class IScene
 {
 public:
     using ObjectSPtr = std::shared_ptr<IObject3D>;
+
     IScene()
     {}
 

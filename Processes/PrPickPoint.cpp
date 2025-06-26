@@ -1,0 +1,56 @@
+#include "PrPickPoint.h"
+
+PrPickPoint::PrPickPoint(PrIds id, IProcess *parent, Editor3D &editor)
+    : ProcessBase(id, parent, editor)
+{
+}
+
+bool PrPickPoint::Run()
+{
+    return BaseClass::Run();
+}
+
+bool PrPickPoint::Stop()
+{
+    if (!m_point.has_value())
+        SetFlag(IProcess::fCancelled);
+    return BaseClass::Stop();
+}
+
+bool PrPickPoint::ReceiveEvent(const Event &event)
+{
+    if (event.GetEventType() != EventType::MouseEvent)
+        return false;
+
+    const MouseEvent &mouseEvent = static_cast<const MouseEvent &>(event);
+    if (mouseEvent.GetAction() == MouseEvent::Action::Press && mouseEvent.GetBtn() == MouseEvent::Button::Left)
+    {
+        m_point = MPoint3D(mouseEvent.GetX(), mouseEvent.GetY(), 0);
+        SetFlag(IProcess::fDone);
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<IPrResult> PrPickPoint::GetPrResult() const
+{
+    if (!m_point.has_value())
+        return nullptr;
+
+    return std::make_unique<PrPointResult>(m_point.value());
+}
+
+std::string PrPickPoint::GetCurStateHint() const
+{
+    return "Укажите 2д точку";
+}
+
+void PrPickPoint::CancelCurState()
+{
+    Stop();
+}
+
+std::set<EventType> PrPickPoint::GetRequiredEventTypes() const
+{
+    return {EventType::MouseEvent};
+}

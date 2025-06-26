@@ -1,0 +1,109 @@
+#include "Application.h"
+
+Application::Application(int argc, char **argv)
+    : m_window()
+    , m_shaderProgram()
+    , m_eventBus(GetEventBus())
+    , m_prManager(m_eventBus)
+    , m_editor(m_prManager)
+    , m_mainProc(m_editor)
+{
+}
+
+bool Application::Init()
+{
+    CreateWindowContext();
+    m_window.setActive(true);
+    glViewport(0, 0, m_window.getSize().x, m_window.getSize().y);
+    m_shaderProgram.InitProgram();
+    LoadShaders();
+
+    auto &&reqEventTypes = m_mainProc.GetRequiredEventTypes();
+    for (auto &&eventType : reqEventTypes)
+        m_eventBus.Subscribe(m_mainProc, eventType);
+
+    m_renderer.AddShaderProgram(m_shaderProgram);
+
+    return true;
+}
+
+int Application::Run()
+{
+    m_renderer.AddScene(&m_editor.GetCurScene());
+
+    while (m_window.isOpen())
+    {
+        CollectEvents();
+        m_eventBus.ProcessEvents();
+
+        m_renderer.Draw();
+
+        m_window.display();
+    }
+
+    return 0;
+}
+
+void Application::AppClose()
+{
+    m_mainProc.Stop();
+    m_prManager.FinishWork();
+    m_editor.FinishWork();
+    m_window.close();
+}
+
+Application::~Application()
+{
+    delete &m_eventBus;
+}
+
+void Application::CreateWindowContext()
+{
+    sf::ContextSettings contextSettings;
+    contextSettings.majorVersion = 4;
+    contextSettings.minorVersion = 6;
+    contextSettings.attributeFlags = sf::ContextSettings::Attribute::Core;
+
+    m_window.create(sf::VideoMode::getDesktopMode(), "MyCAD", sf::Style::Default, contextSettings);
+
+    glewInit();
+}
+
+void Application::LoadShaders()
+{
+    m_shaderProgram.AddVertexShader("vertexshader.vs");
+    m_shaderProgram.AddFragmentShader("fragmentshader.fs");
+    if (!m_shaderProgram.LinkProgram())
+        std::cout << "link shader program error" << std::endl;
+    m_shaderProgram.Use();
+}
+
+void Application::CollectEvents()
+{
+    sf::Event event;
+    while (m_window.pollEvent(event))
+    {
+        switch (event.type)
+        {
+        case sf::Event::Closed:
+        {
+            AppClose();
+            break;
+        }
+        case sf::Event::KeyPressed:
+        {
+            if (event.key.code = sf::Keyboard::P)
+                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::P));
+            else if (event.key.code = sf::Keyboard::M)
+                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
+        }
+        case sf::Event::MouseButtonPressed:
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+                m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));
+        }
+        default:
+            break;
+        }
+    }
+}

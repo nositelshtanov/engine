@@ -23,32 +23,23 @@ class PrPointResult : public IPrResult
 {
     MPoint3D m_point;
 public:
-    PrPointResult(const MPoint3D& point)
-        : IPrResult()
-        , m_point(point)
-    {}
-    virtual PrResultType GetType() const override { return PrResultType::Point; }
-    MPoint3D GetPoint() const { return m_point; }
+    PrPointResult(const MPoint3D& point);
 
-    virtual ~PrPointResult() override = default;
+    virtual PrResultType GetType() const override;
+    MPoint3D GetPoint() const;
+
+    virtual ~PrPointResult() override;
 };
 
 class PrObjResult : public IPrResult
 {
     std::shared_ptr<IObject3D> m_obj;
 public:
-    PrObjResult()
-        : IPrResult()
-        , m_obj(nullptr)
-    {}
-    PrObjResult(std::shared_ptr<IObject3D> obj)
-        : IPrResult()
-        , m_obj(std::move(obj))
-    {}
+    PrObjResult();
+    PrObjResult(std::shared_ptr<IObject3D> obj);
 
+    virtual PrResultType GetType() const override;
+    std::shared_ptr<IObject3D> GetObj() const;
 
-    virtual PrResultType GetType() const override { return PrResultType::Object; }
-    std::shared_ptr<IObject3D> GetObj() const { return m_obj; }
-
-    virtual ~PrObjResult() = default;
+    virtual ~PrObjResult();
 };

@@ -18,75 +18,33 @@ protected:
     std::set<std::shared_ptr<IProcess>> m_childs;
     Editor3D& m_editor;
 public:
-    ProcessBase(PrIds id, IProcess * parent, Editor3D& editor)
-        : EventReceiver()
-        , IProcess()
-        , m_id(id)
-        , m_parent(parent)
-        , m_flags(0)
-        , m_childs()
-        , m_editor(editor)
-    {}
-    virtual PrIds GetPrId() const override { return m_id; }
+    ProcessBase(PrIds id, IProcess * parent, Editor3D& editor);
+    virtual PrIds GetPrId() const override; 
     
-    virtual bool Run() override
-    { 
-        SetFlag(IProcess::fRunning);
-        m_editor.GetPrManager().PushProcess(this);
-        return true; 
-    }
+    virtual bool Run() override;
+    virtual bool Stop() override;
+    virtual IProcess* GetParent() override; 
+    virtual std::set<std::shared_ptr<IProcess>> GetChilds() override; 
 
-    virtual bool Stop() override
-    { 
-        UnsetFlag(IProcess::fRunning);
+    virtual bool ReceiveEvent(const Event& event) override;
 
-        if (m_editor.GetPrManager().PopProcess() != this)
-            std::cout << "Пиздоооос!!!" << std::endl; 
+    virtual size_t GetFlags() const override; 
+    virtual void SetFlag(IProcess::ProcessFlags flag);
+    virtual void UnsetFlag(ProcessFlags flag);
+    virtual bool GetFlagVal(ProcessFlags flag) const override;
 
-        if (m_parent)
-            m_parent->ChildStop(static_cast<PrIds>(GetPrId()));
+    virtual std::unique_ptr<IPrResult> GetPrResult() const;
+    virtual bool IsDone() const;
+    virtual bool IsCancelled() const;
 
-        return true; 
-    }
+    virtual std::set<EventType> GetRequiredEventTypes() const;
 
-    virtual IProcess* GetParent() override { return m_parent; }
-    virtual std::set<std::shared_ptr<IProcess>> GetChilds() override { return m_childs; }
+    virtual void ChildStop(PrIds id);
 
-    virtual bool ReceiveEvent(const Event& event) override
-    { return false; }
+    virtual EventReceiver * GetIEventReceiver();
 
-    virtual size_t GetFlags() const override { return m_flags;}
-    virtual void SetFlag(IProcess::ProcessFlags flag) { m_flags |= flag; }
-    virtual void UnsetFlag(ProcessFlags flag) { m_flags &= ~flag; }
-    virtual bool GetFlagVal(ProcessFlags flag) const override { return m_flags & flag; }
+    std::shared_ptr<IProcess> RunSubProc(PrIds id);
+    std::shared_ptr<IProcess> FindChildProc(PrIds id);
 
-    virtual std::unique_ptr<IPrResult> GetPrResult() const { return nullptr; }
-    virtual bool IsDone() const { return GetFlagVal(IProcess::fDone); } 
-    virtual bool IsCancelled() const { return GetFlagVal(IProcess::fCancelled); }
-
-    virtual std::set<EventType> GetRequiredEventTypes() const { return {EventType::MouseEvent, EventType::KeyBoardEvent}; }
-
-    virtual void ChildStop(PrIds id) {}
-
-    virtual EventReceiver * GetIEventReceiver() { return this; }
-
-    std::shared_ptr<IProcess> RunSubProc(PrIds id)
-    {
-        std::shared_ptr<IProcess> pr(CreateProc(id, this, m_editor));
-        m_childs.emplace(pr);
-        bool res = pr->Run();      
-        return pr;
-    }
-
-    std::shared_ptr<IProcess> FindChildProc(PrIds id)
-    {
-        for (auto && pr : m_childs)
-        {
-            if (pr->GetPrId() == id)
-                return pr;
-        }
-        return nullptr;
-    }
-
-    virtual ~ProcessBase() override = default;
+    virtual ~ProcessBase() override;
 };
