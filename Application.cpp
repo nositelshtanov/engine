@@ -30,6 +30,7 @@ bool Application::Init()
 int Application::Run()
 {
     m_renderer.AddScene(&m_editor.GetCurScene());
+    m_mainProc.Run();
 
     while (m_window.isOpen())
     {
@@ -96,6 +97,9 @@ void Application::CollectEvents()
                 m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::P));
             else if (event.key.code = sf::Keyboard::M)
                 m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
+            else {
+                int a = 3;
+            }
         }
         case sf::Event::MouseButtonPressed:
         {

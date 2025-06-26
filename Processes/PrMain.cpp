@@ -12,10 +12,9 @@ bool PrMain::Run()
 
 bool PrMain::Stop()
 {
-    bool res = BaseClass::Stop();
     for (auto &&child : m_childs)
         child->Stop();
-    return res;
+    return BaseClass::Stop();
 }
 
 bool PrMain::ReceiveEvent(const Event &event)
@@ -31,7 +30,7 @@ bool PrMain::ReceiveEvent(const Event &event)
     {
         auto &&keyboardEvent = static_cast<const KeyboardEvent &>(event);
         if (keyboardEvent.GetKey() == KeyboardEvent::P)
-            RunSubProcess(PrIds::PickPoint);
+            RunSubProcess(PrIds::CreatePoint);
         break;
     }
     default:
@@ -86,9 +85,9 @@ void PrMain::ChildStop(PrIds id)
 
 void PrMain::RunSubProcess(PrIds id)
 {
-    if (id == PrIds::PickPoint)
+    if (id == PrIds::CreatePoint)
     {
-        std::shared_ptr<IProcess> pr(CreateProc(PrIds::PickPoint, this, m_editor));
+        std::shared_ptr<IProcess> pr(CreateProc(PrIds::CreatePoint, this, m_editor));
         m_childs.emplace(pr);
         bool res = pr->Run();
     }

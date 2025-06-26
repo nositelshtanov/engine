@@ -7,7 +7,8 @@ ProcessManager::ProcessManager(EventBus &eventBus)
 
 void ProcessManager::PushProcess(IProcess *pr)
 {
-    DeactivateProcess(m_stack.back());
+    if (!m_stack.empty())
+        DeactivateProcess(m_stack.back());
     m_stack.push_back(pr);
     ActivateProcess(pr);
 }

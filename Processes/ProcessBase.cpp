@@ -1,5 +1,7 @@
 #include "ProcessBase.h"
 
+#include <iostream>
+
 ProcessBase::ProcessBase(PrIds id, IProcess *parent, Editor3D &editor)
     : EventReceiver(), IProcess(), m_id(id), m_parent(parent), m_flags(0), m_childs(), m_editor(editor)
 {

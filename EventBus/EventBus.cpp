@@ -1,5 +1,7 @@
 #include "EventBus.h"
 
+#include <iostream>
+
 size_t EventReceiver::s_lastFreeId = 0;
 
 int EventBus::ProcessEvents()
@@ -7,10 +9,11 @@ int EventBus::ProcessEvents()
     int processedCount = 0;
     std::swap(m_eventsToProcess, m_postedEvents);
     std::swap(m_eventsWithOnlyEmitter, m_postedEventsWithOnlyEmitter);
-    size_t i = 0;
+
+    // добавить обработку с онли эмиттером
     while (!m_eventsToProcess.empty())
     {
-        auto &&event = m_eventsToProcess[i];
+        auto &&event = m_eventsToProcess[0];
         if (!event)
             continue;
 
@@ -25,6 +28,8 @@ int EventBus::ProcessEvents()
 
         if (res)
             ++processedCount;
+        
+        m_eventsToProcess.erase(m_eventsToProcess.begin());
     }
     m_eventsToProcess.clear();
     m_eventsWithOnlyEmitter.clear();
@@ -83,12 +88,37 @@ void EventBus::SendEvent(std::unique_ptr<Event> event)
     }
     m_eventsToProcess.push_back(std::move(event));
 }
+
 void EventBus::PostEvent(std::unique_ptr<Event> event)
 {
     if (event && !event->HasRecipients() && !event->IsBroadcast())
     {
         m_postedEventsWithOnlyEmitter.emplace(event->GetEventEmitterId(), std::move(event));
         return;
+    }
+    if (event)
+    {
+        switch (event->GetEventType())
+        {
+        case EventType::KeyBoardEvent:
+            {
+            KeyboardEvent* ev = static_cast<KeyboardEvent*>(event.get());
+            if (ev->GetKey() == KeyboardEvent::Keys::P)
+                std::cout << "P key event" << std::endl;
+            else 
+                std::cout << "other key event" << std::endl;
+            break;
+            }
+        case EventType::MouseEvent:
+            {
+            std::cout << "mouse event" << std::endl;
+            break;
+            }
+        default:
+        {
+            break;
+        }
+        }
     }
     m_postedEvents.push_back(std::move(event));
 }
