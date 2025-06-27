@@ -93,18 +93,22 @@ void Application::CollectEvents()
         }
         case sf::Event::KeyPressed:
         {
-            if (event.key.code = sf::Keyboard::P)
+            std::cout << "keyPressed " << static_cast<int>(event.key.code) << std::endl;
+            if (event.key.code == sf::Keyboard::P) // 15
+            {
                 m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::P));
-            else if (event.key.code = sf::Keyboard::M)
-                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
-            else {
-                int a = 3;
             }
+            else if (event.key.code == sf::Keyboard::M) // 12
+            {
+                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
+            }
+            break;
         }
         case sf::Event::MouseButtonPressed:
         {
             if (event.mouseButton.button == sf::Mouse::Left)
                 m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));
+            break;
         }
         default:
             break;

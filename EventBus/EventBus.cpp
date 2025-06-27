@@ -96,30 +96,7 @@ void EventBus::PostEvent(std::unique_ptr<Event> event)
         m_postedEventsWithOnlyEmitter.emplace(event->GetEventEmitterId(), std::move(event));
         return;
     }
-    if (event)
-    {
-        switch (event->GetEventType())
-        {
-        case EventType::KeyBoardEvent:
-            {
-            KeyboardEvent* ev = static_cast<KeyboardEvent*>(event.get());
-            if (ev->GetKey() == KeyboardEvent::Keys::P)
-                std::cout << "P key event" << std::endl;
-            else 
-                std::cout << "other key event" << std::endl;
-            break;
-            }
-        case EventType::MouseEvent:
-            {
-            std::cout << "mouse event" << std::endl;
-            break;
-            }
-        default:
-        {
-            break;
-        }
-        }
-    }
+
     m_postedEvents.push_back(std::move(event));
 }
 
