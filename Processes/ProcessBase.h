@@ -10,6 +10,7 @@
 
 class ProcessBase : public EventReceiver 
                   , public IProcess
+                  , public std::enable_shared_from_this<ProcessBase>
 {
     PrIds m_id;
 protected:

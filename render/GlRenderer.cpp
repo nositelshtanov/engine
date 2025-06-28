@@ -32,14 +32,23 @@ void GlRenderer::Draw()
     auto &&drawableObjs = m_scene->GetAllDrawableObjs();
     m_objs.insert(m_objs.end(), drawableObjs.begin(), drawableObjs.end());
 
+    auto normalizeDouble = [](double& num) {
+        while (num > 1 || num < -1) {
+            num /= 10;
+        }
+    };
+
     std::vector<float> vertexData;
     for (auto &&obj : m_objs)
     {
         auto &&vertexes = obj->GetVertexes();
-        std::for_each(vertexes.begin(), vertexes.end(), [&vertexData](const MVertex3D &vertex)
+        std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizeDouble](const MVertex3D &vertex)
         {
             auto point = vertex.GetPoint(); 
             // придумать чо с потерей точности. Перевести тут в принципе надо в NDO
+            normalizeDouble(point.x);
+            normalizeDouble(point.y);
+            normalizeDouble(point.z);
             vertexData.push_back(point.x);
             vertexData.push_back(point.y);
             vertexData.push_back(point.z); 
@@ -61,6 +70,7 @@ void GlRenderer::Draw()
     glDrawArrays(GL_POINTS, 0, vertexData.size() / 2);
 
     glBindVertexArray(0);
+    m_objs.clear();
 }
 
 GlRenderer::~GlRenderer()

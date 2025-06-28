@@ -1,22 +1,24 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "IProcess.h"
+#include "../EventBus/EventReceiver.h"
 #include "../EventBus/EventBus.h"
 
 class ProcessManager 
 {
-    std::vector<IProcess*> m_stack;
+    std::vector<std::shared_ptr<IProcess>> m_stack;
     EventBus& m_eventBus;
 public:
     ProcessManager(EventBus& eventBus);
 
-    void PushProcess(IProcess * pr);
+    void PushProcess(std::shared_ptr<IProcess> pr);
 
-    IProcess * PopProcess();
+    std::shared_ptr<IProcess> PopProcess();
     void FinishWork();
 private:
-    void DeactivateProcess(IProcess * pr);
-    void ActivateProcess(IProcess * pr);
+    void DeactivateProcess(std::shared_ptr<IProcess> pr);
+    void ActivateProcess(std::shared_ptr<IProcess> pr);
 };

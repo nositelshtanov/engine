@@ -9,6 +9,7 @@
 // sfml 2.6
 
 #include <algorithm>
+#include <memory>
 
 #include "shaderProgramCreator.h"
 #include "render/GlRenderer.h"
@@ -25,7 +26,7 @@ class Application
     EventBus& m_eventBus; 
     ProcessManager m_prManager;
     Editor3D m_editor;
-    PrMain m_mainProc;
+    std::shared_ptr<PrMain> m_mainProc;
     GlRenderer m_renderer;
 
 public:

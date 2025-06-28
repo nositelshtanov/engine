@@ -29,7 +29,7 @@ bool PrMain::ReceiveEvent(const Event &event)
     case EventType::KeyBoardEvent:
     {
         auto &&keyboardEvent = static_cast<const KeyboardEvent &>(event);
-        if (keyboardEvent.GetKey() == KeyboardEvent::P)
+        if (keyboardEvent.GetKey() == KeyboardEvent::P && !FindChildProc(PrIds::CreatePoint))
             RunSubProcess(PrIds::CreatePoint);
         break;
     }

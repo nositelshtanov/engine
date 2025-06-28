@@ -27,6 +27,7 @@ bool PrPickPoint::ReceiveEvent(const Event &event)
     {
         m_point = MPoint3D(mouseEvent.GetX(), mouseEvent.GetY(), 0);
         SetFlag(IProcess::fDone);
+        Stop();
         return true;
     }
     return false;
@@ -38,6 +39,16 @@ std::unique_ptr<IPrResult> PrPickPoint::GetPrResult() const
         return nullptr;
 
     return std::make_unique<PrPointResult>(m_point.value());
+}
+
+bool PrPickPoint::IsDone() const
+{
+    return m_point.has_value();
+}
+
+bool PrPickPoint::IsCancelled() const
+{
+    return !IsDone();
 }
 
 std::string PrPickPoint::GetCurStateHint() const

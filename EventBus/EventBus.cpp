@@ -37,47 +37,84 @@ int EventBus::ProcessEvents()
 }
 
 // Подписаться на тип события (будут приходить броадкастные и по таргету). Или лучше даже воспринимать это как фильтр
-void EventBus::Subscribe(EventReceiver &eventReceiver, EventType eventType)
+void EventBus::Subscribe(const std::shared_ptr<EventReceiver>& eventReceiver, EventType eventType)
 {
-    if (auto &&it = m_subscribers.find(eventReceiver.GetReceiverId()); it != m_subscribers.end())
+    if (!eventReceiver)
+        return;
+
+    if (m_subscribersLocker.IsLocked()) {
+        m_subscribersLocker.Subscribe(eventReceiver, eventType);
+        return;
+    }
+
+    if (auto &&it = m_subscribers.find(eventReceiver->GetReceiverId()); it != m_subscribers.end())
     {
         auto &&subscription = (*it).second;
         if (subscription.eventTypes.find(eventType) == subscription.eventTypes.end())
             subscription.eventTypes.insert(eventType);
         return;
     }
-    m_subscribers.insert({eventReceiver.GetReceiverId(), {&eventReceiver, std::set<EventType>({eventType})}});
+    m_subscribers.insert({eventReceiver->GetReceiverId(), {eventReceiver, std::set<EventType>({eventType})}});
 }
 
-void EventBus::ListenToEmitter(const EventReceiver &eventReceiver, size_t emitterId)
+void EventBus::ListenToEmitter(const std::shared_ptr<EventReceiver> &eventReceiver, size_t emitterId)
 {
+    if (!eventReceiver)
+        return;
+
     if (auto &&it = m_emittersToSubs.find(emitterId); it != m_emittersToSubs.end())
     {
         auto &&emitterSubs = (*it).second;
-        if (emitterSubs.find(eventReceiver.GetReceiverId()) == emitterSubs.end())
-            emitterSubs.insert(eventReceiver.GetReceiverId());
+        if (emitterSubs.find(eventReceiver->GetReceiverId()) == emitterSubs.end())
+            emitterSubs.insert(eventReceiver->GetReceiverId());
         return;
     }
-    m_emittersToSubs.insert({emitterId, {eventReceiver.GetReceiverId()}});
+    m_emittersToSubs.insert({emitterId, {eventReceiver->GetReceiverId()}});
 }
 
-void EventBus::Unsubscribe(const EventReceiver &eventReceiver, EventType eventType)
+void EventBus::Unsubscribe(const std::shared_ptr<EventReceiver> &eventReceiver, EventType eventType)
 {
-    if (m_subscribers.find(eventReceiver.GetReceiverId()) == m_subscribers.end())
+    if (!eventReceiver)
         return;
 
-    auto &&subscription = m_subscribers[eventReceiver.GetReceiverId()];
+    if (m_subscribersLocker.IsLocked()) {
+        m_subscribersLocker.Unsubscribe(eventReceiver, eventType);
+        return;
+    }
+
+    if (m_subscribers.find(eventReceiver->GetReceiverId()) == m_subscribers.end())
+        return;
+
+    auto &&subscription = m_subscribers[eventReceiver->GetReceiverId()];
     subscription.eventTypes.erase(eventType);
+
+    if (subscription.eventTypes.empty())
+        m_subscribers.erase(eventReceiver->GetReceiverId());
 }
 
-void EventBus::StopListening(const EventReceiver &eventReceiver, size_t emitterId)
+void EventBus::StopListening(const std::shared_ptr<EventReceiver> &eventReceiver, size_t emitterId)
 {
+    if (!eventReceiver)
+        return;
+
     if (m_emittersToSubs.find(emitterId) == m_emittersToSubs.end())
         return;
 
     auto &&subs = m_emittersToSubs[emitterId];
-    subs.erase(eventReceiver.GetReceiverId());
+    subs.erase(eventReceiver->GetReceiverId());
 }
+
+
+void EventBus::SubscribersLocker::Subscribe(const std::shared_ptr<EventReceiver>& eventReceiver, EventType eventType) {
+}
+
+void EventBus::SubscribersLocker::Unsubscribe(const std::shared_ptr<EventReceiver> &eventReceiver, EventType eventType) {
+}
+
+void EventBus::SubscribersLocker::Unlock() {
+
+}
+
 
 void EventBus::SendEvent(std::unique_ptr<Event> event)
 {
@@ -103,8 +140,9 @@ void EventBus::PostEvent(std::unique_ptr<Event> event)
 bool EventBus::ProcessBroadCast(const Event &event)
 {
     for (auto &&[subscriberId, subscription] : m_subscribers)
-        if (auto *receiver = subscription.receiver)
+        if (auto && receiver = subscription.receiver)
             CheckEvTypesAndSendEvent(*receiver, event);
+
     return true;
 }
 
@@ -114,7 +152,7 @@ bool EventBus::ProcessEventWithTarget(const Event &event)
     for (auto &&recipientId : recipients)
     {
         if (m_subscribers.find(recipientId) != m_subscribers.end())
-            if (auto *eventReceiver = m_subscribers[recipientId].receiver)
+            if (auto && eventReceiver = m_subscribers[recipientId].receiver)
                 CheckEvTypesAndSendEvent(*eventReceiver, event);
     }
     return true;
@@ -125,7 +163,7 @@ bool EventBus::ProcessEventWithOnlyEmitter(const Event &event)
     auto &&subs = m_emittersToSubs[event.GetEventEmitterId()];
     for (auto &&subId : subs)
     {
-        if (auto *receiver = m_subscribers[subId].receiver)
+        if (auto && receiver = m_subscribers[subId].receiver)
             CheckEvTypesAndSendEvent(*receiver, event);
     }
     return true;
@@ -138,6 +176,7 @@ bool EventBus::CheckEvTypesAndSendEvent(EventReceiver &receiver, const Event &ev
         return receiver.ReceiveEvent(event);
     return false;
 }
+
 
 EventBus &GetEventBus()
 {

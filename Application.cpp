@@ -6,7 +6,7 @@ Application::Application(int argc, char **argv)
     , m_eventBus(GetEventBus())
     , m_prManager(m_eventBus)
     , m_editor(m_prManager)
-    , m_mainProc(m_editor)
+    , m_mainProc(std::make_shared<PrMain>(m_editor))
 {
 }
 
@@ -18,10 +18,6 @@ bool Application::Init()
     m_shaderProgram.InitProgram();
     LoadShaders();
 
-    auto &&reqEventTypes = m_mainProc.GetRequiredEventTypes();
-    for (auto &&eventType : reqEventTypes)
-        m_eventBus.Subscribe(m_mainProc, eventType);
-
     m_renderer.AddShaderProgram(m_shaderProgram);
 
     return true;
@@ -30,7 +26,7 @@ bool Application::Init()
 int Application::Run()
 {
     m_renderer.AddScene(&m_editor.GetCurScene());
-    m_mainProc.Run();
+    m_mainProc->Run();
 
     while (m_window.isOpen())
     {
@@ -47,7 +43,7 @@ int Application::Run()
 
 void Application::AppClose()
 {
-    m_mainProc.Stop();
+    m_mainProc->Stop();
     m_prManager.FinishWork();
     m_editor.FinishWork();
     m_window.close();

@@ -14,16 +14,21 @@ PrIds ProcessBase::GetPrId() const
 
 bool ProcessBase::Run()
 {
+    if (GetFlagVal(IProcess::fRunning))
+        return true;
     SetFlag(IProcess::fRunning);
-    m_editor.GetPrManager().PushProcess(this);
+    m_editor.GetPrManager().PushProcess(shared_from_this());
     return true;
 }
 
 bool ProcessBase::Stop()
 {
+    if (!GetFlagVal(IProcess::fRunning))
+        return true;
+
     UnsetFlag(IProcess::fRunning);
 
-    if (m_editor.GetPrManager().PopProcess() != this)
+    if (m_editor.GetPrManager().PopProcess().get() != this)
         std::cout << "Пиздоооос!!!" << std::endl;
 
     if (m_parent)

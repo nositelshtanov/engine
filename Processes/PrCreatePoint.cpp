@@ -57,12 +57,15 @@ std::string PrCreatePoint::GetCurStateHint() const
 
 void PrCreatePoint::ChildStop(PrIds id)
 {
+    std::cout << "prCreateChildStop" << std::endl;
     if (id != PrIds::PickPoint)
         return;
 
     auto &&child = FindChildProc(id);
     if (!child)
         return;
+
+    std::cout << "child is done" << std::endl;
     if (child->IsDone())
     {
         auto &&result = child->GetPrResult();
@@ -71,9 +74,10 @@ void PrCreatePoint::ChildStop(PrIds id)
             auto &&pointResult = static_cast<PrPointResult &>(*result);
             m_pointObj.reset(new Vertex3dObj(pointResult.GetPoint()));
             m_editor.GetCurScene().AddObject(m_pointObj);
+            std::cout << "stop create point proc" << std::endl;
+            Stop();
         }
     }
-    m_childs.erase(child);
 }
 
 void PrCreatePoint::RunPickPointSubProcess()

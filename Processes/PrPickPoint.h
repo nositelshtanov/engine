@@ -19,6 +19,8 @@ public:
 
     virtual bool ReceiveEvent(const Event& event);
     virtual std::unique_ptr<IPrResult> GetPrResult() const;
+    virtual bool IsDone() const;
+    virtual bool IsCancelled() const;
     virtual std::string GetCurStateHint() const;
     virtual void CancelCurState();
     virtual std::set<EventType> GetRequiredEventTypes() const;

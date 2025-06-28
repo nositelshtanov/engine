@@ -1,11 +1,14 @@
 #include "ProcessManager.h"
 
+#include <iostream>
+
 ProcessManager::ProcessManager(EventBus &eventBus)
-    : m_eventBus(eventBus)
+    : m_stack()
+    , m_eventBus(eventBus)
 {
 }
 
-void ProcessManager::PushProcess(IProcess *pr)
+void ProcessManager::PushProcess(std::shared_ptr<IProcess> pr)
 {
     if (!m_stack.empty())
         DeactivateProcess(m_stack.back());
@@ -13,13 +16,14 @@ void ProcessManager::PushProcess(IProcess *pr)
     ActivateProcess(pr);
 }
 
-IProcess *ProcessManager::PopProcess()
+std::shared_ptr<IProcess> ProcessManager::PopProcess()
 {
-    auto *pr = m_stack.back();
+    auto && pr = m_stack.back();
     DeactivateProcess(pr);
     m_stack.pop_back();
     if (!m_stack.empty())
         ActivateProcess(m_stack.back());
+    std::cout << std::endl;
     return pr;
 }
 
@@ -27,18 +31,20 @@ void ProcessManager::FinishWork()
 {
 }
 
-void ProcessManager::DeactivateProcess(IProcess *pr)
+void ProcessManager::DeactivateProcess(std::shared_ptr<IProcess> pr)
 {
+    std::cout << "deactivate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
     pr->UnsetFlag(IProcess::fActive);
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)
-        m_eventBus.Unsubscribe(*pr->GetIEventReceiver(), evType);
+        m_eventBus.Unsubscribe(std::dynamic_pointer_cast<EventReceiver>(pr) , evType);
 }
 
-void ProcessManager::ActivateProcess(IProcess *pr)
+void ProcessManager::ActivateProcess(std::shared_ptr<IProcess> pr)
 {
+    std::cout << "activate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
     pr->SetFlag(IProcess::fActive);
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)
-        m_eventBus.Subscribe(*pr->GetIEventReceiver(), evType);
+        m_eventBus.Subscribe(std::dynamic_pointer_cast<EventReceiver>(pr), evType);
 }
