@@ -105,14 +105,38 @@ void EventBus::StopListening(const std::shared_ptr<EventReceiver> &eventReceiver
 }
 
 
-void EventBus::SubscribersLocker::Subscribe(const std::shared_ptr<EventReceiver>& eventReceiver, EventType eventType) {
+void EventBus::SubscribersLocker::Subscribe(const std::shared_ptr<EventReceiver>& eventReceiver, EventType eventType)
+{
+    if (!eventReceiver)
+        return;
+    m_toSubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
 }
 
-void EventBus::SubscribersLocker::Unsubscribe(const std::shared_ptr<EventReceiver> &eventReceiver, EventType eventType) {
+void EventBus::SubscribersLocker::Unsubscribe(const std::shared_ptr<EventReceiver> &eventReceiver, EventType eventType)
+{
+    if (!eventReceiver)
+        return;
+    m_toUnsubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
 }
 
 void EventBus::SubscribersLocker::Unlock() {
+    m_isLocked = false;
+    for (auto && [subscriberId, subscription]: m_toSubscribe) {
+        m_eventBus.Subscribe(subscription.receiver, *subscription.eventTypes.begin());
+    }
+    for (auto && [subscriberId, subscription]: m_toUnsubscribe) {
+        m_eventBus.Unsubscribe(subscription.receiver, *subscription.eventTypes.begin());
+    }
+}
 
+RaiiWrapper EventBus::SubscribersLocker::CreateLock(SubscribersLocker& subscribersLocker) {
+    auto onCreate = [&subscribersLocker]() {
+        subscribersLocker.Lock();
+    };
+    auto onDelete = [&subscribersLocker]() {
+        subscribersLocker.Unlock();
+    };
+    return RaiiWrapper(onCreate, onDelete);
 }
 
 
@@ -139,6 +163,7 @@ void EventBus::PostEvent(std::unique_ptr<Event> event)
 
 bool EventBus::ProcessBroadCast(const Event &event)
 {
+    auto && lock = SubscribersLocker::CreateLock(m_subscribersLocker);
     for (auto &&[subscriberId, subscription] : m_subscribers)
         if (auto && receiver = subscription.receiver)
             CheckEvTypesAndSendEvent(*receiver, event);
@@ -148,6 +173,7 @@ bool EventBus::ProcessBroadCast(const Event &event)
 
 bool EventBus::ProcessEventWithTarget(const Event &event)
 {
+    auto && lock = SubscribersLocker::CreateLock(m_subscribersLocker);
     auto &&recipients = event.GetRecipients();
     for (auto &&recipientId : recipients)
     {
@@ -160,6 +186,7 @@ bool EventBus::ProcessEventWithTarget(const Event &event)
 
 bool EventBus::ProcessEventWithOnlyEmitter(const Event &event)
 {
+    auto && lock = SubscribersLocker::CreateLock(m_subscribersLocker);
     auto &&subs = m_emittersToSubs[event.GetEventEmitterId()];
     for (auto &&subId : subs)
     {

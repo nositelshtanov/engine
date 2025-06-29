@@ -87,7 +87,7 @@ void PrMain::RunSubProcess(PrIds id)
 {
     if (id == PrIds::CreatePoint)
     {
-        std::shared_ptr<IProcess> pr(CreateProc(PrIds::CreatePoint, this, m_editor));
+        auto && pr = CreateProc(PrIds::CreatePoint, this, m_editor);
         m_childs.emplace(pr);
         bool res = pr->Run();
     }

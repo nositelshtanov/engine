@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "EventReceiver.h"
+#include "../Util.h"
 
 
 class EventBus
@@ -28,18 +29,22 @@ class EventBus
     Subscribers m_subscribers;
     std::unordered_map<size_t, std::set<size_t>> m_emittersToSubs; // эмиттер - его подписчики
 
+public:
     class SubscribersLocker {
-        Subscribers& m_lockedSubscribers;
+        EventBus& m_eventBus;
         bool m_isLocked;
         std::vector<std::pair<size_t, Subscription>> m_toSubscribe;
         std::vector<std::pair<size_t, Subscription>> m_toUnsubscribe;
     public:
-        SubscribersLocker(Subscribers& subscribers)
-            : m_lockedSubscribers(subscribers)
+        SubscribersLocker(EventBus& eventBus)
+            : m_eventBus(eventBus)
             , m_isLocked(false)
             , m_toSubscribe()
             , m_toUnsubscribe()
         {}
+
+        static RaiiWrapper CreateLock(SubscribersLocker& subscribersLocker);
+
         void Lock() {
             m_isLocked = true;
         }
@@ -51,6 +56,7 @@ class EventBus
         void Unsubscribe(const std::shared_ptr<EventReceiver>& eventReceiver, EventType eventType);
         void Unlock();
     };
+private:
 
     SubscribersLocker m_subscribersLocker;
 
@@ -62,7 +68,7 @@ public:
         , m_eventsWithOnlyEmitter()
         , m_postedEventsWithOnlyEmitter()
         , m_subscribers()
-        , m_subscribersLocker(m_subscribers)
+        , m_subscribersLocker(*this)
     {}
     int ProcessEvents();
      

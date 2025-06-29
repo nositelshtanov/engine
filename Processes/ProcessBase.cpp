@@ -104,7 +104,7 @@ EventReceiver *ProcessBase::GetIEventReceiver()
 
 std::shared_ptr<IProcess> ProcessBase::RunSubProc(PrIds id)
 {
-    std::shared_ptr<IProcess> pr(CreateProc(id, this, m_editor));
+    auto && pr = CreateProc(id, this, m_editor);
     m_childs.emplace(pr);
     bool res = pr->Run();
     return pr;
