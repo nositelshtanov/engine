@@ -4,10 +4,14 @@
 
 #include <GL/glew.h>
 #include <SFML/OpenGL.hpp>
+//#include "../gltext.h"
 
 #include "IRenderer.h"
 #include "IDrawable.h"
 #include "../shaderProgramCreator.h"
+#include "../Processes/ProcTextHint.h"
+
+struct GLTtext;
 
 class GlRenderer : public IRenderer
 {
@@ -16,16 +20,26 @@ class GlRenderer : public IRenderer
     ShaderProgram m_shaderProgram;
     unsigned int m_vertexesVAO;
     unsigned int m_vertexesVBO;
+    GLTtext* m_procHint;
+    std::shared_ptr<ProcTextHint> m_procHintObj;
+    float m_viewportWidth;
+    float m_viewportHeight;
 public:
     GlRenderer();
 
     void AddShaderProgram(const ShaderProgram& shaderProgram);
-    void Init();
+    bool Init();
     void AddScene(IScene* scene);
+    void AddProcHintObj(std::shared_ptr<ProcTextHint> hintObj);
     void Draw();
+
+    void SetViewportSize(float width, float height);
 
     virtual ~GlRenderer() override;
 
 private:
+    void DrawText();
+
     void InitVertexesVAO();
+    bool InitGLText();
 };

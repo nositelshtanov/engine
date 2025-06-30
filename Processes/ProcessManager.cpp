@@ -38,6 +38,7 @@ void ProcessManager::DeactivateProcess(std::shared_ptr<IProcess> pr)
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)
         m_eventBus.Unsubscribe(std::dynamic_pointer_cast<EventReceiver>(pr) , evType);
+    pr->Deactivated();
 }
 
 void ProcessManager::ActivateProcess(std::shared_ptr<IProcess> pr)
@@ -47,4 +48,5 @@ void ProcessManager::ActivateProcess(std::shared_ptr<IProcess> pr)
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)
         m_eventBus.Subscribe(std::dynamic_pointer_cast<EventReceiver>(pr), evType);
+    pr->Activated();
 }

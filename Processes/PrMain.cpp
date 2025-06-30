@@ -63,7 +63,7 @@ bool PrMain::IsCancelled() const
 
 std::string PrMain::GetCurStateHint() const 
 { 
-    return ""; 
+    return "P - create point; M - move something; ";
 }
 
 void PrMain::CancelCurState() 
@@ -81,6 +81,14 @@ void PrMain::ChildStop(PrIds id)
         auto &&result = child->GetPrResult();
     }
     m_childs.erase(child);
+}
+
+void PrMain::Activated() {
+    BaseClass::Activated();
+}
+
+void PrMain::Deactivated() {
+    BaseClass::Deactivated();
 }
 
 void PrMain::RunSubProcess(PrIds id)

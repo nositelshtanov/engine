@@ -25,6 +25,8 @@ public:
 
     virtual void ChildStop(PrIds id);
 
+    virtual void Activated();
+    virtual void Deactivated();
 private:
     void RunSubProcess(PrIds id);
 };

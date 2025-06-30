@@ -7,6 +7,7 @@ Application::Application(int argc, char **argv)
     , m_prManager(m_eventBus)
     , m_editor(m_prManager)
     , m_mainProc(std::make_shared<PrMain>(m_editor))
+    , m_renderer()
 {
 }
 
@@ -19,7 +20,10 @@ bool Application::Init()
     LoadShaders();
 
     m_renderer.AddShaderProgram(m_shaderProgram);
-    m_renderer.Init();
+    bool res = m_renderer.Init();
+    if (!res)
+        std::cout << "renderer Init FAILED" << std::endl;
+    m_renderer.AddProcHintObj(m_editor.GetProcTextHint());
 
     return true;
 }
@@ -105,6 +109,11 @@ void Application::CollectEvents()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
                 m_eventBus.PostEvent(std::make_unique<MouseEvent>(event.mouseButton.x, event.mouseButton.y, MouseEvent::Button::Left, MouseEvent::Action::Press));
+            break;
+        }
+        case sf::Event::Resized:
+        {
+            m_renderer.SetViewportSize(static_cast<float>(event.size.width), static_cast<float>(event.size.height));
             break;
         }
         default:

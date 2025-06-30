@@ -47,5 +47,8 @@ public:
     std::shared_ptr<IProcess> RunSubProc(PrIds id);
     std::shared_ptr<IProcess> FindChildProc(PrIds id);
 
+    virtual void Activated();
+    virtual void Deactivated();
+
     virtual ~ProcessBase() override;
 };

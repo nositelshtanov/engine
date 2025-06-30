@@ -120,4 +120,12 @@ std::shared_ptr<IProcess> ProcessBase::FindChildProc(PrIds id)
     return nullptr;
 }
 
+void ProcessBase::Activated() {
+    m_editor.SetHint(GetCurStateHint());
+}
+
+void ProcessBase::Deactivated() {
+
+}
+
 ProcessBase::~ProcessBase() = default;
