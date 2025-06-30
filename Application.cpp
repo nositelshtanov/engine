@@ -19,6 +19,7 @@ bool Application::Init()
     LoadShaders();
 
     m_renderer.AddShaderProgram(m_shaderProgram);
+    m_renderer.Init();
 
     return true;
 }

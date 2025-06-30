@@ -33,14 +33,20 @@ public:
     class SubscribersLocker {
         EventBus& m_eventBus;
         bool m_isLocked;
-        std::vector<std::pair<size_t, Subscription>> m_toSubscribe;
-        std::vector<std::pair<size_t, Subscription>> m_toUnsubscribe;
+        struct SubEvent {
+            Subscription subscription;
+            bool isSub; // подписка или отписка
+        };
+        std::vector<SubEvent> m_subEvents;
+        //std::vector<std::pair<size_t, Subscription>> m_toSubscribe;
+        //std::vector<std::pair<size_t, Subscription>> m_toUnsubscribe;
     public:
         SubscribersLocker(EventBus& eventBus)
             : m_eventBus(eventBus)
             , m_isLocked(false)
-            , m_toSubscribe()
-            , m_toUnsubscribe()
+            , m_subEvents()
+            //, m_toSubscribe()
+            //, m_toUnsubscribe()
         {}
 
         static RaiiWrapper CreateLock(SubscribersLocker& subscribersLocker);

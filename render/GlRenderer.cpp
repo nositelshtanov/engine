@@ -51,7 +51,7 @@ void GlRenderer::Draw()
             normalizeDouble(point.z);
             vertexData.push_back(point.x);
             vertexData.push_back(point.y);
-            vertexData.push_back(point.z); 
+            //vertexData.push_back(point.z);
         });
     }
 
@@ -62,10 +62,11 @@ void GlRenderer::Draw()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
+    m_shaderProgram.Use();
+
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    m_shaderProgram.Use();
     glPointSize(3.5f);
     glDrawArrays(GL_POINTS, 0, vertexData.size() / 2);
 

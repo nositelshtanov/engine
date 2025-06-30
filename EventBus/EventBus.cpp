@@ -109,24 +109,32 @@ void EventBus::SubscribersLocker::Subscribe(const std::shared_ptr<EventReceiver>
 {
     if (!eventReceiver)
         return;
-    m_toSubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
+    //m_toSubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
+    m_subEvents.push_back(SubEvent{Subscription{eventReceiver, {eventType}}, true});
 }
 
 void EventBus::SubscribersLocker::Unsubscribe(const std::shared_ptr<EventReceiver> &eventReceiver, EventType eventType)
 {
     if (!eventReceiver)
         return;
-    m_toUnsubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
+    //m_toUnsubscribe.push_back(std::make_pair(eventReceiver->GetReceiverId(), Subscription{eventReceiver, {eventType}}));
+    m_subEvents.push_back(SubEvent{Subscription{eventReceiver, {eventType}}, false});
 }
 
 void EventBus::SubscribersLocker::Unlock() {
     m_isLocked = false;
-    for (auto && [subscriberId, subscription]: m_toSubscribe) {
+    for (auto && subEvent : m_subEvents) {
+        if (subEvent.isSub)
+            m_eventBus.Subscribe(subEvent.subscription.receiver, *subEvent.subscription.eventTypes.begin());
+        else
+            m_eventBus.Unsubscribe(subEvent.subscription.receiver, *subEvent.subscription.eventTypes.begin());
+    }
+    /*for (auto && [subscriberId, subscription]: m_toSubscribe) {
         m_eventBus.Subscribe(subscription.receiver, *subscription.eventTypes.begin());
     }
     for (auto && [subscriberId, subscription]: m_toUnsubscribe) {
         m_eventBus.Unsubscribe(subscription.receiver, *subscription.eventTypes.begin());
-    }
+    }*/
 }
 
 RaiiWrapper EventBus::SubscribersLocker::CreateLock(SubscribersLocker& subscribersLocker) {
