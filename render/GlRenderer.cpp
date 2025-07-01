@@ -1,6 +1,10 @@
 #include "GlRenderer.h"
 
 #define GLT_IMPLEMENTATION
+
+#define GLT_DEBUG
+#define GLT_DEBUG_PRINT
+
 #include "../gltext.h"
 
 GlRenderer::GlRenderer()
@@ -70,11 +74,11 @@ void GlRenderer::Draw()
     }
 
     glBindVertexArray(m_vertexesVAO);
+    // поч без этой строки не работает? VBO автоматически разве не биндится?
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexesVBO);
 
+    // Проблема походу тут в этой строке
     glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
 
     m_shaderProgram.Use();
 
@@ -127,6 +131,9 @@ void GlRenderer::InitVertexesVAO()
 
     glGenBuffers(1, &m_vertexesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexesVBO);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
 }

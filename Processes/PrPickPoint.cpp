@@ -53,7 +53,7 @@ bool PrPickPoint::IsCancelled() const
 
 std::string PrPickPoint::GetCurStateHint() const
 {
-    return "Укажите 2д точку";
+    return "pick point";
 }
 
 void PrPickPoint::CancelCurState()
