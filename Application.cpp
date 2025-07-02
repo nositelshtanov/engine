@@ -102,6 +102,9 @@ void Application::CollectEvents()
             else if (event.key.code == sf::Keyboard::M) // 12
             {
                 m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::M));
+            } else if (event.key.code == sf::Keyboard::E) // 4
+            {
+                m_eventBus.PostEvent(std::make_unique<KeyboardEvent>(KeyboardEvent::E));
             }
             break;
         }

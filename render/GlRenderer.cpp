@@ -4,6 +4,7 @@
 
 #define GLT_DEBUG
 #define GLT_DEBUG_PRINT
+#define GLT_MANUAL_VIEWPORT
 
 #include "../gltext.h"
 
@@ -13,6 +14,8 @@ GlRenderer::GlRenderer()
     , m_shaderProgram()
     , m_vertexesVAO(0)
     , m_vertexesVBO(0)
+    , m_edgesVAO(0)
+    , m_edgesVBO(0)
     , m_procHint()
     , m_procHintObj(nullptr)
     , m_viewportWidth(0.0f)
@@ -30,6 +33,7 @@ bool GlRenderer::Init()
     bool res = true;
     res = InitGLText();
     InitVertexesVAO();
+    InitEdgesVAO();
     return res;
 }
 
@@ -61,9 +65,12 @@ void GlRenderer::Draw()
     };
 
     std::vector<float> vertexData;
+    std::vector<float> edgesData;
     for (auto &&obj : m_objs)
     {
         auto &&vertexes = obj->GetVertexes();
+        auto && edges = obj->GetEdges();
+
         std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizePoint3D](const MVertex3D &vertex)
         {
             auto point = normalizePoint3D(vertex.GetPoint());
@@ -71,6 +78,16 @@ void GlRenderer::Draw()
             vertexData.push_back(point.x);
             vertexData.push_back(point.y);
             //vertexData.push_back(point.z);
+        });
+
+        std::for_each(edges.begin(), edges.end(), [&edgesData, &normalizePoint3D](const MEdge3D& edge) {
+            auto begPoint = normalizePoint3D(edge.GetGegVertex().GetPoint());
+            auto endPoint = normalizePoint3D(edge.GetEndVertex().GetPoint());
+
+            edgesData.push_back(begPoint.x);
+            edgesData.push_back(begPoint.y);
+            edgesData.push_back(endPoint.x);
+            edgesData.push_back(endPoint.y);
         });
     }
 
@@ -90,14 +107,23 @@ void GlRenderer::Draw()
     glPointSize(3.5f);
     glDrawArrays(GL_POINTS, 0, vertexData.size() / 2);
 
+
+    glBindVertexArray(m_edgesVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_edgesVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, edgesData.size() * sizeof(float), edgesData.data(), GL_STATIC_DRAW);
+
+    glDrawArrays(GL_LINES, 0,  edgesData.size() / 2);
+
     glBindVertexArray(0);
     m_objs.clear();
 
     DrawText();
-    std::cout << "error: " << glGetError() << std::endl;
+    //std::cout << "error: " << glGetError() << std::endl;
 }
 
 void GlRenderer::DrawText() {
+    gltViewport(m_viewportWidth, m_viewportHeight);
     gltBeginDraw();
 
     auto && hint = m_procHintObj->GetText();
@@ -111,8 +137,10 @@ void GlRenderer::DrawText() {
 
 
 void GlRenderer::SetViewportSize(float width, float height) {
-    m_viewportWidth = width;
-    m_viewportHeight = height;
+    if (width && height) {
+        m_viewportWidth = width;
+        m_viewportHeight = height;
+    }
 }
 
 GlRenderer::~GlRenderer()
@@ -137,7 +165,21 @@ void GlRenderer::InitVertexesVAO()
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
-    std::cout << "init error: " << glGetError() << std::endl;
+    std::cout << "init vertexes error: " << glGetError() << std::endl;
+}
+
+void GlRenderer::InitEdgesVAO() {
+    glGenVertexArrays(1, &m_edgesVAO);
+    glBindVertexArray(m_edgesVAO);
+
+    glGenBuffers(1, &m_edgesVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_edgesVBO);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+    std::cout << "init edges error: " << glGetError() << std::endl;
 }
 
 bool GlRenderer::InitGLText() {

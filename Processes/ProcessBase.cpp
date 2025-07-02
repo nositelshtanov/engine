@@ -45,7 +45,7 @@ IProcess *ProcessBase::GetParent()
     return m_parent; 
 }
 
-std::set<std::shared_ptr<IProcess>> ProcessBase::GetChilds() 
+std::vector<std::shared_ptr<IProcess>> ProcessBase::GetChilds()
 { 
     return m_childs; 
 }
@@ -95,9 +95,12 @@ std::set<EventType> ProcessBase::GetRequiredEventTypes() const
     return {EventType::MouseEvent, EventType::KeyBoardEvent}; 
 }
 
-void ProcessBase::ChildStop(PrIds id) 
-{
-
+void ProcessBase::ChildStop(PrIds id) {
+    auto && it = std::find_if(m_childs.begin(), m_childs.end(), [&id](const std::shared_ptr<IProcess>& pr) {
+        return pr->GetPrId() == id;
+    });
+    if (it != m_childs.end())
+        m_childs.erase(it);
 }
 
 EventReceiver *ProcessBase::GetIEventReceiver() 
@@ -108,7 +111,7 @@ EventReceiver *ProcessBase::GetIEventReceiver()
 std::shared_ptr<IProcess> ProcessBase::RunSubProc(PrIds id)
 {
     auto && pr = CreateProc(id, this, m_editor);
-    m_childs.emplace(pr);
+    m_childs.push_back(pr);
     bool res = pr->Run();
     return pr;
 }

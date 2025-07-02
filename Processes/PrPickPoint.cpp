@@ -26,6 +26,7 @@ bool PrPickPoint::ReceiveEvent(const Event &event)
     if (mouseEvent.GetAction() == MouseEvent::Action::Press && mouseEvent.GetBtn() == MouseEvent::Button::Left)
     {
         m_point = MPoint3D(mouseEvent.GetX(), mouseEvent.GetY(), 0);
+        //std::cout << "Picked point: " << m_point->x << " " << m_point->y << std::endl;
         SetFlag(IProcess::fDone);
         Stop();
         return true;

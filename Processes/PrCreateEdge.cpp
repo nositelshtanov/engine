@@ -3,7 +3,7 @@
 PrCreateEdge::PrCreateEdge(PrIds id, IProcess * parent, Editor3D& editor)
    : ProcessBase(id, parent, editor)
    , m_edgeObj(std::make_shared<Edge3dObj>())
-   , m_twoPointsPicked(false)
+   , m_onePointPicked(false)
 {}
 
 bool PrCreateEdge::Run() {
@@ -22,7 +22,7 @@ bool PrCreateEdge::ReceiveEvent(const Event& event) {
 }
 
 bool PrCreateEdge::IsDone() const {
-    return m_edgeObj && m_twoPointsPicked;
+    return m_edgeObj && m_onePointPicked;
 }
 
 bool PrCreateEdge::IsCancelled() const {
@@ -53,18 +53,28 @@ void PrCreateEdge::ChildStop(PrIds id) {
     if (!child)
         return;
 
+    bool needStop = false;
+
     if (child->IsDone()) {
         auto && result = child->GetPrResult();
         if (result->GetType() == PrResultType::Point) {
             auto && pointResult = static_cast<PrPointResult &>(*result).GetPoint();;
-            if (!m_twoPointsPicked)
+            if (!m_onePointPicked) {
                 m_edgeObj->SetBegVertex(pointResult);
+                RunSubProc(PrIds::PickPoint);
+                m_onePointPicked = true;
+            }
             else {
-                m_twoPointsPicked = true;
                 m_edgeObj->SetEndVertex(pointResult);
+                auto && edge = m_edgeObj->GetEdges()[0];
+                std::cout << "points: (" << edge.GetGegVertex().GetPoint().x << " " << edge.GetGegVertex().GetPoint().y << ") (" << edge.GetEndVertex().GetPoint().x << " " << edge.GetEndVertex().GetPoint().y << ");" << std::endl;
                 m_editor.GetCurScene().AddObject(m_edgeObj);
-                Stop();
+                needStop = true;
             }
         }
     }
+    BaseClass::ChildStop(id);
+
+    if (needStop)
+        Stop();
 }

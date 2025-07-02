@@ -10,7 +10,7 @@
 
 class PrCreateEdge : public ProcessBase {
     std::shared_ptr<Edge3dObj> m_edgeObj;
-    bool m_twoPointsPicked;
+    bool m_onePointPicked;
 public:
     using BaseClass = ProcessBase;
 

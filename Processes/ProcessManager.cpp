@@ -33,7 +33,7 @@ void ProcessManager::FinishWork()
 
 void ProcessManager::DeactivateProcess(std::shared_ptr<IProcess> pr)
 {
-    std::cout << "deactivate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
+    //std::cout << "deactivate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
     pr->UnsetFlag(IProcess::fActive);
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)
@@ -43,7 +43,7 @@ void ProcessManager::DeactivateProcess(std::shared_ptr<IProcess> pr)
 
 void ProcessManager::ActivateProcess(std::shared_ptr<IProcess> pr)
 {
-    std::cout << "activate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
+    //std::cout << "activate Proc: " << static_cast<int>(pr->GetPrId()) << std::endl;
     pr->SetFlag(IProcess::fActive);
     auto &&reqEvTypes = pr->GetIEventReceiver()->GetRequiredEventTypes();
     for (auto &&evType : reqEvTypes)

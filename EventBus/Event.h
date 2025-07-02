@@ -73,6 +73,7 @@ public:
     {
         P,
         M,
+        E,
         count
     };
 private:

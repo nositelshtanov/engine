@@ -1,6 +1,6 @@
 #pragma once
 
-#include <set>
+#include <vector>
 #include <memory>
 #include <string>
 
@@ -12,6 +12,7 @@ enum class PrIds : size_t
     Main = 0,
     PickPoint,
     CreatePoint,
+    CreateEdge,
     count
 };
 
@@ -34,7 +35,7 @@ public:
     virtual bool Stop() = 0;
 
     virtual IProcess* GetParent() = 0;
-    virtual std::set<std::shared_ptr<IProcess>> GetChilds() = 0;
+    virtual std::vector<std::shared_ptr<IProcess>> GetChilds() = 0;
 
     virtual size_t GetFlags() const = 0;
     virtual bool GetFlagVal(ProcessFlags flag) const = 0;

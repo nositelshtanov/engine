@@ -4,8 +4,10 @@
 #include <functional>
 #include <memory>
 
+#include "PrCreateEdge.h"
 #include "PrPickPoint.h"
 #include "PrCreatePoint.h"
+#include "PrCreateEdge.h"
 
 namespace 
 {
@@ -28,11 +30,16 @@ std::shared_ptr<IProcess> CreatePrCreatePoint(PrIds id, IProcess* parent, Editor
     return std::make_shared<PrCreatePoint>(id, parent, editor);
 }
 
+std::shared_ptr<IProcess> CreatePrCreateEdge(PrIds id, IProcess* parent, Editor3D& editor) {
+   return std::make_shared<PrCreateEdge>(id, parent, editor);
+}
+
 std::array<std::function<std::shared_ptr<IProcess>(PrIds, IProcess*, Editor3D&)>, static_cast<size_t>(PrIds::count)> PrIdsToCreateFuncs =
 {
     CreateMainProc,
     CreatePrPickPoint,
-    CreatePrCreatePoint
+    CreatePrCreatePoint,
+    CreatePrCreateEdge
 };
 
 }

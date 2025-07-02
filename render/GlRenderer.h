@@ -20,6 +20,8 @@ class GlRenderer : public IRenderer
     ShaderProgram m_shaderProgram;
     unsigned int m_vertexesVAO;
     unsigned int m_vertexesVBO;
+    unsigned int m_edgesVAO;
+    unsigned int m_edgesVBO;
     GLTtext* m_procHint;
     std::shared_ptr<ProcTextHint> m_procHintObj;
     float m_viewportWidth;
@@ -41,5 +43,6 @@ private:
     void DrawText();
 
     void InitVertexesVAO();
+    void InitEdgesVAO();
     bool InitGLText();
 };

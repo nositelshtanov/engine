@@ -45,6 +45,14 @@ public:
     void SetEndVertex(const MVertex3D& vertex) {
         m_end = vertex;
     }
+
+    MVertex3D GetGegVertex() const {
+        return m_begin;
+    }
+
+    MVertex3D GetEndVertex() const {
+        return m_end;
+    }
 };
 
 class MFace3D

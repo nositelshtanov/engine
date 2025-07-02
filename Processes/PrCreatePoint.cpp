@@ -63,6 +63,8 @@ void PrCreatePoint::ChildStop(PrIds id)
     if (!child)
         return;
 
+    bool needStop = false;
+
     std::cout << "child is done" << std::endl;
     if (child->IsDone())
     {
@@ -73,9 +75,13 @@ void PrCreatePoint::ChildStop(PrIds id)
             m_pointObj.reset(new Vertex3dObj(pointResult.GetPoint()));
             m_editor.GetCurScene().AddObject(m_pointObj);
             std::cout << "stop create point proc" << std::endl;
-            Stop();
+            needStop = true;
         }
     }
+    BaseClass::ChildStop(id);
+
+    if (needStop)
+        Stop();
 }
 
 void PrCreatePoint::RunPickPointSubProcess()

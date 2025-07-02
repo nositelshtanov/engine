@@ -29,6 +29,8 @@ bool PrMain::ReceiveEvent(const Event &event)
         auto &&keyboardEvent = static_cast<const KeyboardEvent &>(event);
         if (keyboardEvent.GetKey() == KeyboardEvent::P && !FindChildProc(PrIds::CreatePoint))
             RunSubProcess(PrIds::CreatePoint);
+        else if (keyboardEvent.GetKey() == KeyboardEvent::E && !FindChildProc(PrIds::CreateEdge))
+            RunSubProcess(PrIds::CreateEdge);
         break;
     }
     default:
@@ -61,7 +63,7 @@ bool PrMain::IsCancelled() const
 
 std::string PrMain::GetCurStateHint() const 
 { 
-    return "P - create point; M - move something; ";
+    return "P - create point; E - create edge; M - move something; ";
 }
 
 void PrMain::CancelCurState() 
@@ -71,14 +73,7 @@ void PrMain::CancelCurState()
 
 void PrMain::ChildStop(PrIds id)
 {
-    auto &&child = FindChildProc(id);
-    if (!child)
-        return;
-    if (child->IsDone())
-    {
-        auto &&result = child->GetPrResult();
-    }
-    m_childs.erase(child);
+    BaseClass::ChildStop(id);
 }
 
 void PrMain::Activated() {
@@ -89,12 +84,6 @@ void PrMain::Deactivated() {
     BaseClass::Deactivated();
 }
 
-void PrMain::RunSubProcess(PrIds id)
-{
-    if (id == PrIds::CreatePoint)
-    {
-        auto && pr = CreateProc(PrIds::CreatePoint, this, m_editor);
-        m_childs.emplace(pr);
-        bool res = pr->Run();
-    }
+void PrMain::RunSubProcess(PrIds id) {
+    BaseClass::RunSubProc(id);
 }
