@@ -50,23 +50,24 @@ void GlRenderer::Draw()
     auto &&drawableObjs = m_scene->GetAllDrawableObjs();
     m_objs.insert(m_objs.end(), drawableObjs.begin(), drawableObjs.end());
 
-    auto normalizeDouble = [](double& num) {
-        while (num > 1 || num < -1) {
-            num /= 10;
-        }
+    auto normalizePoint3D = [this](const MPoint3D& point) {
+        MPoint3D newPoint = point;
+        auto wHalf = m_viewportWidth / 2;
+        auto hHalf = m_viewportHeight / 2;
+        newPoint.x = (newPoint.x - wHalf) / wHalf;
+        newPoint.y = (newPoint.y - hHalf) / hHalf;
+        newPoint.y *= -1;
+        return newPoint;
     };
 
     std::vector<float> vertexData;
     for (auto &&obj : m_objs)
     {
         auto &&vertexes = obj->GetVertexes();
-        std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizeDouble](const MVertex3D &vertex)
+        std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizePoint3D](const MVertex3D &vertex)
         {
-            auto point = vertex.GetPoint(); 
+            auto point = normalizePoint3D(vertex.GetPoint());
             // придумать чо с потерей точности. Перевести тут в принципе надо в NDO
-            normalizeDouble(point.x);
-            normalizeDouble(point.y);
-            normalizeDouble(point.z);
             vertexData.push_back(point.x);
             vertexData.push_back(point.y);
             //vertexData.push_back(point.z);
@@ -77,7 +78,6 @@ void GlRenderer::Draw()
     // поч без этой строки не работает? VBO автоматически разве не биндится?
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexesVBO);
 
-    // Проблема походу тут в этой строке
     glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
 
     m_shaderProgram.Use();
@@ -94,6 +94,7 @@ void GlRenderer::Draw()
     m_objs.clear();
 
     DrawText();
+    std::cout << "error: " << glGetError() << std::endl;
 }
 
 void GlRenderer::DrawText() {
@@ -136,6 +137,7 @@ void GlRenderer::InitVertexesVAO()
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+    std::cout << "init error: " << glGetError() << std::endl;
 }
 
 bool GlRenderer::InitGLText() {
