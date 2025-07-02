@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "PrResult.h"
-#include "../Editor3D.h"
+#include "../Editor/Editor3D.h"
 #include "ProcessCreator.h"
 #include "ProcessBase.h"
 #include "../Scene/Point3dObj.h"

@@ -15,7 +15,7 @@
 #include "render/GlRenderer.h"
 #include "EventBus/EventBus.h"
 #include "EventBus/Event.h"
-#include "Editor3D.h"
+#include "Editor/Editor3D.h"
 #include "Processes/ProcessManager.h"
 #include "Processes/PrMain.h"
 

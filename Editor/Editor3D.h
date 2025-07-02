@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include "Processes/ProcessManager.h"
-#include "Scene/Scene.h"
-#include "Processes/ProcTextHint.h"
+#include "../Processes/ProcessManager.h"
+#include "../Scene/Scene.h"
+#include "../Processes/ProcTextHint.h"
 
 class Editor3D : public EventReceiver
 {

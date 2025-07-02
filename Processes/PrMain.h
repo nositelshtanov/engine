@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Editor3D.h"
+#include "../Editor/Editor3D.h"
 #include "ProcessCreator.h"
 #include "PrPickPoint.h"
 #include "../EventBus/Event.h"
