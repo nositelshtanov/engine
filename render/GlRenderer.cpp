@@ -54,49 +54,6 @@ void GlRenderer::Draw()
     auto &&drawableObjs = m_scene->GetAllDrawableObjs();
     m_objs.insert(m_objs.end(), drawableObjs.begin(), drawableObjs.end());
 
-    auto normalizePoint3D = [this](const MPoint3D& point) {
-        MPoint3D newPoint = point;
-        auto wHalf = m_viewportWidth / 2;
-        auto hHalf = m_viewportHeight / 2;
-        newPoint.x = (newPoint.x - wHalf) / wHalf;
-        newPoint.y = (newPoint.y - hHalf) / hHalf;
-        newPoint.y *= -1;
-        return newPoint;
-    };
-
-    std::vector<float> vertexData;
-    std::vector<float> edgesData;
-    for (auto &&obj : m_objs)
-    {
-        auto &&vertexes = obj->GetVertexes();
-        auto && edges = obj->GetEdges();
-
-        std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizePoint3D](const MVertex3D &vertex)
-        {
-            auto point = normalizePoint3D(vertex.GetPoint());
-
-            vertexData.push_back(point.x);
-            vertexData.push_back(point.y);
-            //vertexData.push_back(point.z);
-        });
-
-        std::for_each(edges.begin(), edges.end(), [&edgesData, &normalizePoint3D](const MEdge3D& edge) {
-            auto begPoint = normalizePoint3D(edge.GetGegVertex().GetPoint());
-            auto endPoint = normalizePoint3D(edge.GetEndVertex().GetPoint());
-
-            edgesData.push_back(begPoint.x);
-            edgesData.push_back(begPoint.y);
-            edgesData.push_back(endPoint.x);
-            edgesData.push_back(endPoint.y);
-        });
-    }
-
-    glBindVertexArray(m_vertexesVAO);
-    // поч без этой строки не работает? VBO автоматически разве не биндится?
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexesVBO);
-
-    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
-
     m_shaderProgram.Use();
 
     glViewport(0, 0, m_viewportWidth, m_viewportHeight);
@@ -104,9 +61,28 @@ void GlRenderer::Draw()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glPointSize(3.5f);
-    glDrawArrays(GL_POINTS, 0, vertexData.size() / 2);
+    DrawVertices(m_objs);
+    DrawEdges(m_objs);
 
+    DrawText();
+    m_objs.clear();
+    //std::cout << "error: " << glGetError() << std::endl;
+}
+
+void GlRenderer::DrawEdges(const std::vector<std::shared_ptr<IDrawable>>& objs) {
+    std::vector<float> edgesData;
+    for (auto && obj : objs) {
+        auto && edges = obj->GetEdges();
+        for (auto && edge : edges) {
+            auto begPoint = NormalizePoint(edge.GetGegVertex().GetPoint());
+            auto endPoint = NormalizePoint(edge.GetEndVertex().GetPoint());
+
+            edgesData.push_back(begPoint.x);
+            edgesData.push_back(begPoint.y);
+            edgesData.push_back(endPoint.x);
+            edgesData.push_back(endPoint.y);
+        }
+    }
 
     glBindVertexArray(m_edgesVAO);
     glBindBuffer(GL_ARRAY_BUFFER, m_edgesVBO);
@@ -116,10 +92,45 @@ void GlRenderer::Draw()
     glDrawArrays(GL_LINES, 0,  edgesData.size() / 2);
 
     glBindVertexArray(0);
-    m_objs.clear();
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
-    DrawText();
-    //std::cout << "error: " << glGetError() << std::endl;
+void GlRenderer::DrawVertices(const std::vector<std::shared_ptr<IDrawable>>& objs) {
+    std::vector<float> vertexData;
+    for (auto && obj : objs) {
+        auto &&vertexes = obj->GetVertexes();
+        for (auto && vertex : vertexes) {
+            auto point = NormalizePoint(vertex.GetPoint());
+
+            vertexData.push_back(point.x);
+            vertexData.push_back(point.y);
+            //vertexData.push_back(point.z);
+        }
+    }
+
+    glBindVertexArray(m_vertexesVAO);
+    // поч без этой строки не работает? VBO автоматически разве не биндится?
+    // UDP: да, только отрисовка достает из VAO VBO, а для настройки (в т.ч. буфер поменять) нужно биндить
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexesVBO);
+
+    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), vertexData.data(), GL_STATIC_DRAW);
+
+    glPointSize(3.5f);
+    glDrawArrays(GL_POINTS, 0, vertexData.size() / 2);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+MPoint3D GlRenderer::NormalizePoint(const MPoint3D& point) const {
+    MPoint3D newPoint = point;
+    auto wHalf = m_viewportWidth / 2;
+    auto hHalf = m_viewportHeight / 2;
+    newPoint.x = (newPoint.x - wHalf) / wHalf;
+    newPoint.y = (newPoint.y - hHalf) / hHalf;
+    newPoint.y *= -1;
+    return newPoint;
 }
 
 void GlRenderer::DrawText() {

@@ -41,6 +41,9 @@ public:
 
 private:
     void DrawText();
+    void DrawEdges(const std::vector<std::shared_ptr<IDrawable>>& objs);
+    void DrawVertices(const std::vector<std::shared_ptr<IDrawable>>& objs);
+    MPoint3D NormalizePoint(const MPoint3D& point) const;
 
     void InitVertexesVAO();
     void InitEdgesVAO();
