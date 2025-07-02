@@ -12,8 +12,6 @@ bool PrMain::Run()
 
 bool PrMain::Stop()
 {
-    for (auto &&child : m_childs)
-        child->Stop();
     return BaseClass::Stop();
 }
 

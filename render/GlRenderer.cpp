@@ -67,7 +67,7 @@ void GlRenderer::Draw()
         std::for_each(vertexes.begin(), vertexes.end(), [&vertexData, &normalizePoint3D](const MVertex3D &vertex)
         {
             auto point = normalizePoint3D(vertex.GetPoint());
-            // придумать чо с потерей точности. Перевести тут в принципе надо в NDO
+
             vertexData.push_back(point.x);
             vertexData.push_back(point.y);
             //vertexData.push_back(point.z);

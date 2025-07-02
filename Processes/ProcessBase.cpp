@@ -23,6 +23,9 @@ bool ProcessBase::Run()
 
 bool ProcessBase::Stop()
 {
+    for (auto &&child : m_childs)
+        child->Stop();
+
     if (!GetFlagVal(IProcess::fRunning))
         return true;
 

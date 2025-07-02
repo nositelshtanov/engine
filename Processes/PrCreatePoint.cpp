@@ -14,8 +14,6 @@ bool PrCreatePoint::Run()
 
 bool PrCreatePoint::Stop()
 {
-    for (auto &&child : m_childs)
-        child->Stop();
     /// TODO добавить объект в модель через контроллер
     return BaseClass::Stop();
 }

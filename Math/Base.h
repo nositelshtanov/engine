@@ -1,5 +1,7 @@
 #pragma once
 
+// подумать как в организовать связи между мат. объектами и память
+
 class MPoint3D
 {
 public:
@@ -30,7 +32,19 @@ public:
 
 class MEdge3D
 {
+    MVertex3D m_begin;
+    MVertex3D m_end;
 public:
+    MEdge3D()
+        : m_begin()
+        , m_end()
+    {}
+    void SetBegVertex(const MVertex3D& vertex) {
+        m_begin = vertex;
+    }
+    void SetEndVertex(const MVertex3D& vertex) {
+        m_end = vertex;
+    }
 };
 
 class MFace3D
